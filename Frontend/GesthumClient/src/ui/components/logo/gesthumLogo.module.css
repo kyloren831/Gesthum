@@ -1,0 +1,62 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+.logoSection{
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  width: 100%;               
+  max-width: 1140px;   
+  max-height: 50vh;
+}
+.iconImage {
+    padding-top: 1rem;
+    aspect-ratio: 1 / 1;
+    background: url(/images/GESTHUM_ICON.png);
+    background-size:cover;
+    background-position: center;
+    display: block;
+}
+.title{
+  font-family: "Bangers", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--Dark-blue);
+  padding: 0;
+  margin: 0;
+}
+
+.subtitle{
+    font-family: "Bangers", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--Dark-gray);
+  margin: 0;
+  text-align: center;
+}
+
+/* Tamaño por defecto (Header principal) */
+.logoSection.default .iconImage{
+  height: clamp(150px, 2vw, 200px);
+  width: clamp(150px, 2vw, 200px);
+  aspect-ratio: 1/1;
+}
+.logoSection.default .title{
+  font-size:clamp(3rem, 5vw, 5rem);
+}
+.logoSection.default .subtitle{
+   font-size:clamp(1rem, 1vw, 3rem);
+}
+
+/* Tamaño pequeño (Footer) */
+.logoSection.small .iconImage{
+  height: clamp(10px, 1vw, 50px);
+  width: clamp(20px, 1vw, 50px);
+  aspect-ratio: 1/1;
+}
+.logoSection.small .title{
+  font-size:clamp(1rem, 2vw, 2rem);
+}
+.logoSection.small .subtitle{
+   font-size:6px;
+}

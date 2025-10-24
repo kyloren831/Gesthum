@@ -1,0 +1,6 @@
+@GesthumServer_HostAddress = http://localhost:5177
+
+GET {{GesthumServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

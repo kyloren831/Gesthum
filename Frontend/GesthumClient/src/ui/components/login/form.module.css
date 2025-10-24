@@ -1,0 +1,96 @@
+
+.formContainer{
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+}
+
+.txtInput{
+    border-radius: 1rem;
+    border: 1px solid #E7E7E7;
+    height: 2rem;
+    width: 94%;
+    gap: 1rem;
+    margin: 2% 0 2%;
+    font-size: 0.7lh;
+    padding-left: 5%;
+}
+.txtInput:focus{
+    outline-color: #d9cfae; /* azul */
+    color: var(--Dark-blue);
+}
+.checkbox{
+    padding: 0;
+    width: 10%;
+}
+.emailLabel{
+    position: relative;
+}
+.emailIcon{
+    position: absolute;
+    top: 20px;
+    left:10px;
+    float: left;
+}
+.checkboxLabel{
+    cursor: pointer;
+    color: var(--Dark-blue);
+    margin-left: 0;
+    user-select: none;       
+    -webkit-user-select: none; 
+    -moz-user-select: none;   
+    -ms-user-select: none;
+}
+.subMenu{
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0 1rem;
+}
+.subMenu a{
+    color: var(--Dark-blue);
+}
+@media (max-width: 1280px) {
+     .txtInput{
+        padding-left: 7%;
+    }
+    .emailIcon{
+        top: 17px;
+    }
+}
+
+@media (max-width: 768px) {
+    .formContainer{
+         width: 75%;
+    }
+    .txtInput{
+        padding-left: 10%; /* sobrescribe la anterior */
+    }
+    .emailIcon{
+        top: 15px;
+        left:10px; /* sobrescribe la anterior */
+    }
+}
+
+.error{
+    border: solid 1px red;
+    background-color: #fcb7b7;
+    color: white;
+    text-align: center;
+}
+
+.btnPrimary{
+  font-family:"Nunito", monospace;
+  font-weight: 600;
+  background-color: var(--Dark-blue);
+  color: white;
+  border-radius: 2rem;
+  text-align: center;
+  padding: 10px;
+}
+
+.btnPrimary:hover{
+  background-color: var(--Light-gold);
+  color: var(--Dark-blue);
+  cursor: pointer;
+  border: solid 1px var(--Dark-blue);
+}

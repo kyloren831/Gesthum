@@ -1,0 +1,62 @@
+############################################
+# ============ FRONTEND (React + Vite) ============
+############################################
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+############################################
+# ============ BACKEND (.NET 8) ============
+############################################
+## Visual Studio / .NET build artifacts
+bin/
+obj/
+*.user
+*.db
+*.sqlite
+*.mdb
+*.pdb
+*.cache
+*.vs/
+*.snupkg
+*.swp
+
+# ASP.NET generated files
+launchSettings.json
+
+# Configuration
+appsettings.Development.json
+appsettings.Local.json
+
+############################################
+# ============ GENERAL / SISTEMA ============
+############################################
+Thumbs.db
+ehthumbs.db
+*.pid
+*.seed
+*.bak
+*.tmp
+*.log

@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700&display=swap');
+
+:root{
+  --Dark-blue: #102c5e;
+  --Sky-blue:#87CEEB;
+  --Light-gold:#F5F5DC;
+  --Dark-gray:#595959;
+  --Light-gray:hwb(0 59% 41%);
+}
+*{
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}

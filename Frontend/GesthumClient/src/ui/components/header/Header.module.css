@@ -1,0 +1,150 @@
+.headerContainer{
+    width: 100vw;
+    height: 70px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    box-shadow: 10px 10px 10px rgb(0, 0, 0,0.1);
+
+}
+.logoContainer{
+    margin-left: 1%;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+
+.inputContainer{
+    margin-right: auto;
+    margin-left: 2%;
+    position: relative;
+}
+.searchIcon{
+    position: absolute;
+    left: 5px;
+    top: 11px;
+    color: var(--Dark-blue);
+}
+.searchInput{
+    border-radius: 1rem;
+    border: 1px solid #E7E7E7;
+    height: 2rem;
+    width: 94%;
+    gap: 1rem;
+    margin: 2% 0 2%;
+    font-size: 0.7lh;
+    padding-left: 15%;
+    color: var(--Dark-blue);
+}
+
+.searchInput::placeholder {
+    color: var(--Dark-blue);
+}
+
+.userImage{
+    width: 40px;
+    height:40px;
+    border-radius: 50%;
+    border: solid 1px;
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+.userInfo{
+    display: flex;
+    flex-direction: column;
+    width: 10vw;
+    color: var(--Dark-blue);
+    font-weight: bold;
+}
+.userJobPosition{
+    font-size: 15px;
+}
+.userNameContainer{
+    display: flex;
+}
+.userName{
+    font-size: 12px;
+    width: 75%;
+    color: var(--Dark-blue);
+    font-weight: lighter;
+}
+.iconColor{
+    color: var(--Dark-blue);
+    margin-left: -10px;
+}
+.menu{
+    position: relative;
+    width: 75%;
+}
+
+.subMenu{
+    position:absolute;
+    opacity: 0;
+    pointer-events: none;
+    top:50%;
+    left: 0;
+    color: white;
+    font-size: 12px;
+    list-style: none;
+    background-color: var(--Dark-blue);
+    padding: 0.5rem  0 .5rem;
+    border-radius: 0.5rem;
+    width: 75%;
+    overflow: hidden;
+    box-shadow: 5px 5px 10px rgb(0, 0, 0,0.5);
+}
+.subMenuItem{
+    width: 100%;
+    padding: 4%;
+    display: flex;
+    gap: 4px;
+    cursor: pointer;
+}
+.subMenuItem:hover{
+    background-color: #fff;
+}
+.menu:hover .subMenu{
+    top:100%;
+    opacity: 1;
+    pointer-events: all;
+}
+
+.link:hover{
+    color: var(--Dark-blue);
+}
+
+.link{
+    text-decoration: none;
+    color: white;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .headerContainer{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-column-gap: 60px;
+    }
+    .logoContainer { grid-area: 1 / 1 / 3 / 2; }
+    .inputContainer { 
+        grid-area: 1 / 2 / 2 / 3; 
+    }
+    .userImage { 
+        grid-area: 2 / 2 / 3 / 3; 
+        width: 99%;
+    }
+    .userInfo { 
+        grid-area: 1 / 3 / 3 / 4; 
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 1280px) {
+    .container{
+        width: 90%;
+    }
+}
+
