@@ -1,3 +1,4 @@
+using GesthumServer.Filters;
 using GesthumServer.Models;
 using GesthumServer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +16,14 @@ builder.Services.AddScoped<IVacanciesServices, VacanciesServices>();
 builder.Services.AddScoped<IEmployeesServices, EmployeesServices>();
 builder.Services.AddScoped<IAdminServices, AdminServices>();
 builder.Services.AddScoped<IUsersServices, UsersServices>();
+builder.Services.AddScoped<IResumesServices, ResumesServices>();
+
+// Add global exception filter
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiExceptionFilter>();
+});
+
 
 builder.Services.AddDbContext<DbContextGesthum>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

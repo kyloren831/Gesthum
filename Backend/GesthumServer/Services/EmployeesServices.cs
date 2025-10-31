@@ -8,6 +8,8 @@ namespace GesthumServer.Services
         Task<Employee> CreateEmployee(Employee employee);
         Task<Employee> GetEmployeeById(int id);
         Task<Employee> UpdateEmployee(int id, Employee updatedEmployee);
+        Task<string> GetEmployeePhotoById(int id);
+        Task UpdateEmployeePhoto(int id, string photoUrl);
     }
 
     public class EmployeesServices : IEmployeesServices
@@ -46,6 +48,27 @@ namespace GesthumServer.Services
             dbContext.Employees.Update(existingEmployee);
             await dbContext.SaveChangesAsync();
             return existingEmployee;
+        }
+
+        public async Task<string> GetEmployeePhotoById(int id)
+        {
+            var employee = await dbContext.Employees.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            if (employee == null)
+            {
+                throw new KeyNotFoundException("Employee not found");
+            }
+            return employee.PhotoUrl;
+        }
+        public async Task UpdateEmployeePhoto(int id, string photoUrl)
+        {
+            var existingEmployee = await dbContext.Employees.FindAsync(id);
+            if (existingEmployee == null)
+            {
+                throw new KeyNotFoundException("Employee not found");
+            }
+            existingEmployee.PhotoUrl = photoUrl;
+            dbContext.Employees.Update(existingEmployee);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

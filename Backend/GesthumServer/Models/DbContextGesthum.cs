@@ -10,7 +10,7 @@ namespace GesthumServer.Models
         public DbSet<Vacancy> Vacancies { get; set; }
         public DbSet<Application> Applications { get; set; }
         public DbSet<Evaluation> Evaluations { get; set; }
-        public DbSet<Profile> Profiles { get; set; }
+        public DbSet<WorkExperience> WorkExperiences { get; set; }
         public DbContextGesthum(DbContextOptions<DbContextGesthum> options) : base(options)
         {
         }
@@ -18,6 +18,11 @@ namespace GesthumServer.Models
         {
             base.OnModelCreating(modelBuilder);
             // Additional configuration can be added here if needed
+            modelBuilder.Entity<WorkExperience>()
+                .HasOne(wke=> wke.Resume)
+                .WithMany(r=> r.WorkExperience)
+                .HasForeignKey(wke=> wke.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

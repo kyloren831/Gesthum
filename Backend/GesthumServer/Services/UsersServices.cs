@@ -61,7 +61,7 @@ namespace GesthumServer.Services
             else
             {
                 var errorMessage = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Failed to get user info: {errorMessage}");
+                throw new HttpRequestException($"Failed to get user info: {errorMessage}");
             }
         }
         public async Task<UserClaims> UpdateUserInfo(UserClaims userClaims, UserInfo userInfo)
@@ -70,10 +70,6 @@ namespace GesthumServer.Services
             if (userClaims.Role == "Admin")
             {
                 var existingAdmin = await adminServices.GetAdminById(userClaims.Id);
-                if (existingAdmin == null)
-                {
-                    throw new Exception("Failed to get admin user info");
-                }
                 var updatedAdmin = new Admin
                 {
                     Id = userClaims.Id,
@@ -81,20 +77,12 @@ namespace GesthumServer.Services
                     Email = userInfo.Email
                 };
                 var user = await adminServices.UpdateAdmin(userClaims.Id, updatedAdmin);
-                if (user == null)
-                {
-                    throw new Exception("Failed to update admin user info");
-                }
                 userClaims.IsFirstLogin = false;
                 return userClaims;
             }
             else
             {
                 var existingEmployee = await employeesServices.GetEmployeeById(userClaims.Id);
-                if (existingEmployee == null)
-                {
-                    throw new Exception("Failed to get admin user info");
-                }
                 var updatedEmployee = new Employee
                 {
                     Id = userClaims.Id,
@@ -102,10 +90,6 @@ namespace GesthumServer.Services
                     Email = userInfo.Email
                 };
                 var user = await employeesServices.UpdateEmployee(userClaims.Id, updatedEmployee);
-                if (user == null)
-                {
-                    throw new Exception("Failed to update employee user info");
-                }
                 userClaims.IsFirstLogin = false;
                 return userClaims;
             }
@@ -115,26 +99,24 @@ namespace GesthumServer.Services
         {
             if (userClaims.Role == "Admin")
             {
-                Admin newAdmin = new Admin
+                await adminServices.CreateAdmin(new Admin
                 {
                     Id = userClaims.Id,
                     Name = userInfo.Name,
                     Email = userInfo.Email,
                     Photo = ""
-                };
-                await adminServices.CreateAdmin(newAdmin);
+                });
             }
             else if (userClaims.Role == "Employee")
             {
-                Employee newEmployee = new Employee
+                await employeesServices.CreateEmployee(new Employee
                 {
                     Id = userClaims.Id,
                     Name = userInfo.Name,
                     Email = userInfo.Email,
                     Department = userInfo.Department,
-                    Position= userInfo.JobPosition
-                };
-                await employeesServices.CreateEmployee(newEmployee);
+                    Position = userInfo.JobPosition
+                });
             }
             userClaims.IsFirstLogin = true;
             return userClaims;
@@ -142,24 +124,12 @@ namespace GesthumServer.Services
 
         public async Task<UserClaims> HandleUserInfo(UserClaims userClaims, string token)
         {
-            try
-            {
-                var userInfo = await GetUserInfoById(userClaims.Id, token);
-                var firstTimeA = await IsFirstTimeAdmin(userClaims.Id);
-                var firstTimeB = await IsFirstTimeEmployee(userClaims.Id);
-                if (firstTimeA && firstTimeB)
-                {
-                    return await CreateUserInfo(userClaims, userInfo);
-                }
-                else
-                {
-                    return await UpdateUserInfo(userClaims, userInfo);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            var userInfo = await GetUserInfoById(userClaims.Id, token);
+            var firstTimeA = await IsFirstTimeAdmin(userClaims.Id);
+            var firstTimeB = await IsFirstTimeEmployee(userClaims.Id);
+            // Both first time
+            if (firstTimeA && firstTimeB) return await CreateUserInfo(userClaims, userInfo);
+            return await UpdateUserInfo(userClaims, userInfo);
         }
 
     }

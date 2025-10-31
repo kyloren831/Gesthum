@@ -8,6 +8,8 @@ namespace GesthumServer.Services
         Task<Admin> CreateAdmin(Admin admin);
         Task<Admin> GetAdminById(int id);
         Task<Admin> UpdateAdmin(int id, Admin updatedAdmin);
+        Task<string> GetAdminPhotoById(int id);
+        Task UpdateAdminPhoto(int id, string photoUrl);
     }
 
     public class AdminServices : IAdminServices
@@ -47,5 +49,28 @@ namespace GesthumServer.Services
             await dbContext.SaveChangesAsync();
             return existingAdmin;
         }
+
+        public async Task<string> GetAdminPhotoById(int id)
+        {
+            var admin = await dbContext.Admins.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            if (admin == null)
+            {
+                throw new KeyNotFoundException("Admin not found");
+            }
+            return admin.Photo;
+        }
+        public async Task UpdateAdminPhoto(int id, string photoUrl)
+        {
+            var existingAdmin = await dbContext.Admins.FindAsync(id);
+            if (existingAdmin == null)
+            {
+                throw new KeyNotFoundException("Admin not found");
+            }
+            existingAdmin.Photo = photoUrl;
+            dbContext.Admins.Update(existingAdmin);
+            await dbContext.SaveChangesAsync();
+        }
+
+
     }
 }

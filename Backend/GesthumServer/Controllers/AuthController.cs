@@ -19,14 +19,7 @@ namespace GesthumServer.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            try
-            {
-                return Ok(await authService.AuthenticateUserAsync(loginRequest, HttpContext));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-            }
+           return Ok(await authService.AuthenticateUserAsync(loginRequest, HttpContext));
         }
         [HttpPost("logout")]
         [Authorize]

@@ -4,6 +4,7 @@ using GesthumServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GesthumServer.Migrations
 {
     [DbContext(typeof(DbContextGesthum))]
-    partial class DbContextGesthumModelSnapshot : ModelSnapshot
+    [Migration("20251030060107_fixResume")]
+    partial class fixResume
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,6 +39,7 @@ namespace GesthumServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Photo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -91,6 +95,7 @@ namespace GesthumServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhotoUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Position")
@@ -171,8 +176,7 @@ namespace GesthumServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Resumes");
                 });
@@ -231,7 +235,7 @@ namespace GesthumServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Position")
@@ -248,7 +252,7 @@ namespace GesthumServer.Migrations
 
                     b.HasIndex("ResumeId");
 
-                    b.ToTable("WorkExperiences");
+                    b.ToTable("WorkExperience");
                 });
 
             modelBuilder.Entity("GesthumServer.Models.Application", b =>
@@ -284,8 +288,8 @@ namespace GesthumServer.Migrations
             modelBuilder.Entity("GesthumServer.Models.Resume", b =>
                 {
                     b.HasOne("GesthumServer.Models.Employee", "Employee")
-                        .WithOne("Resume")
-                        .HasForeignKey("GesthumServer.Models.Resume", "EmployeeId")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -300,11 +304,6 @@ namespace GesthumServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Resume");
-                });
-
-            modelBuilder.Entity("GesthumServer.Models.Employee", b =>
-                {
                     b.Navigation("Resume");
                 });
 

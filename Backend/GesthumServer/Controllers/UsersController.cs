@@ -22,29 +22,29 @@ namespace GesthumServer.Controllers
         [Authorize]
         public async Task<IActionResult> Get(int id)
         {
-            try
-            {
-                var admin = await adminServices.GetAdminById(id);
-                return Ok(admin);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-            }
+             var admin = await adminServices.GetAdminById(id);
+             return Ok(admin);
         }
         [HttpGet("{id}/employee")]
         [Authorize]
         public async Task<IActionResult> GetEmployee(int id)
         {
-            try
-            {
-                var employee = await employeesServices.GetEmployeeById(id);
-                return Ok(employee);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.Message });
-            }
+            var employee = await employeesServices.GetEmployeeById(id);
+            return Ok(employee);
+        }
+        [HttpPatch("{id}/admin")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePhoto(int id, [FromBody] string photoUrl)
+        {
+            await adminServices.UpdateAdminPhoto(id, photoUrl);
+            return Ok(new { Message = "Admin photo updated successfully" });
+        }
+        [HttpPatch("{id}/employee")]
+        [Authorize]
+        public async Task<IActionResult> UpdateEmployeePhoto(int id, [FromBody] string photoUrl)
+        {
+           await employeesServices.UpdateEmployeePhoto(id, photoUrl);
+           return Ok(new { Message = "Employee photo updated successfully" });
         }
     }
 }

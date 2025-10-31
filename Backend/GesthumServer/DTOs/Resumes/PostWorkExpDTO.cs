@@ -1,19 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
-namespace GesthumServer.Models
+namespace GesthumServer.DTOs.Resumes
 {
-    public class WorkExperience
+    public class PostWorkExpDTO
     {
-        public int Id { get; set; }
-        [ForeignKey("ResumeId")]
-        public int ResumeId { get; set; }
         public string CompanyName { get; set; }
         public string Position { get; set; }
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        [JsonIgnore]
-        public Resume Resume { get; set; }
     }
 }
