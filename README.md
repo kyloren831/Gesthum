@@ -105,17 +105,6 @@ Frontend (React)
 
 ---
 
-## 👥 Equipo de Desarrollo
-
-| Nombre | Rol | Correo |
-|--------|------|--------|
-| **Fiorella Jiménez Jenkins** | Desarrollo Frontend | fiorella.jimenezjenkins@ucr.ac.cr |
-| **Josué Espinoza Chavarría** | Backend y BD | josue.espinozachavarria@ucr.ac.cr |
-| **Estefanie Quirós Solano** | Análisis y Diseño | estefanie.quirossolano@ucr.ac.cr |
-| **Aaron Méndez Castro** | Integración e IA | aaron.mendezcastro@ucr.ac.cr |
-
----
-
 ## 🧩 Instalación (Modo local)
 
 ```bash
