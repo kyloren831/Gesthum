@@ -33,7 +33,7 @@ namespace GesthumServer.Controllers
             return Ok(vacancy);
         }
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> CreateVacancy([FromBody] PostVacancy vacant)
         {
             var createdVacancy = await service.CreateVacancy(vacant);

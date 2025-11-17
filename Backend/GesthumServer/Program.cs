@@ -18,6 +18,7 @@ builder.Services.AddScoped<IAdminServices, AdminServices>();
 builder.Services.AddScoped<IUsersServices, UsersServices>();
 builder.Services.AddScoped<IResumesServices, ResumesServices>();
 builder.Services.AddScoped<IApplicationsServices, ApplicationsServices>();
+builder.Services.AddScoped<IEvaluationServices, EvaluationServices>();
 
 // Add global exception filter
 builder.Services.AddControllers(options =>

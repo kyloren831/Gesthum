@@ -1,0 +1,179 @@
+:root {
+    --card-bg: #ffffff;
+    --muted: #6b7280;
+    --border: rgba(0,0,0,0.06);
+    --shadow: 0 6px 18px rgba(15,23,42,0.06);
+    --accent-green: #16a34a;
+    --accent-red: #ef4444;
+    --primary: #0f172a;
+    --primary-blue: #2563EB;
+    --primary-blue-hover: #1e40af;
+    /* Gradiente y sombra para el FAB / botón primary (variables) */
+    --fab-gradient-start: #2563EB;
+    --fab-gradient-end: #1e40af;
+    --fab-shadow: 0 6px 18px rgba(37,99,235,0.18);
+}
+
+/* Grid */
+.ListGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.ListContainer {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 0 0;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+/* Cabecera: título */
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin: 0 0 1rem 0;
+    flex-wrap: nowrap;
+}
+
+/* Botón fijo: solo posicionamiento / layout.
+   Las propiedades visuales deben venir de .primaryButton. */
+.createButtonFixed {
+    position: fixed;
+    right: 24px;
+    top: calc(var(--header-height, 70px) + 70px);
+
+    /* Layout / tamaño */
+    padding: 8px 14px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 180ms cubic-bezier(.2,.9,.2,1), opacity 120ms, filter 120ms;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 210;
+
+    /* NO definir background/border/box-shadow aquí */
+}
+
+/* Hover / active */
+.createButtonFixed:hover {
+    transform: translateY(-4px) scale(1.02);
+    /* no tocar box-shadow ni colores aquí para no interferir con .primaryButton */
+}
+
+.createButtonFixed:active {
+    transform: translateY(0);
+}
+
+/* Focus visible para accesibilidad */
+.createButtonFixed:focus-visible {
+    outline: 3px solid rgba(77,144,255,0.24);
+    outline-offset: 4px;
+}
+
+/* espacio entre icono y texto */
+.iconSpacing {
+    margin-right: 8px;
+}
+
+/* Aseguramos que el título esté pegado a la izquierda */
+.ListContainer > h2 {
+    margin: 0;
+    text-align: left;
+}
+
+/* Loader */
+.loaderContainer {
+    display: flex;
+    justify-content: flex-start; /* pegado a la izquierda */
+    align-items: center;
+    padding: 2rem 0;
+}
+
+.loaderImg {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+/* Responsive: en pantallas pequeñas el contenedor ocupa todo y el texto vuelve a centrado/left */
+@media (max-width: 520px) {
+    /* Si el diseño no cabe, el botón se acerca más y se reduce; en pantallas muy pequeñas usar FAB inferior */
+    .createButtonFixed {
+        right: 12px;
+        top: auto !important;
+        bottom: calc(env(safe-area-inset-bottom, 20px) + 12px) !important;
+        padding: 7px 10px;
+        width: 56px;
+        height: 56px;
+        border-radius: 999px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 210 !important;
+        /* NO definir background/box-shadow aquí */
+    }
+
+    .createButtonFixed .iconSpacing {
+        display: none;
+    }
+
+    .iconSpacing {
+        margin-right: 6px;
+    }
+
+    .loaderContainer {
+        justify-content: center;
+    }
+}
+
+/* Móvil: transformar botón fijo en FAB en la esquina inferior derecha.
+   No se aplican colores/gradientes aquí para que .primaryButton controle la apariencia. */
+@media (max-width: 768px) {
+    .createButtonFixed {
+        position: fixed !important;
+        font-size: 0.85rem;
+        top: auto !important; /* aseguramos que no hay top aplicado */
+        bottom: calc(env(safe-area-inset-bottom, 20px) + 12px) !important; /* siempre abajo */
+        right: 16px !important;
+        padding: 0;
+        width: 56px; /* tamaño típico de FAB */
+        height: 56px;
+        border-radius: 999px; /* forma circular */
+        justify-content: center;
+        align-items: center;
+        z-index: 210 !important;
+        /* NO definir background/box-shadow aquí */
+    }
+
+    .createButtonFixed .iconSpacing {
+        display: none; /* ocultar espacio de texto en FAB */
+    }
+
+    .ListContainer {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .ListGrid {
+        gap: 12px;
+    }
+}
+
+/* Tablet: reducir margen y ajustar cards */
+@media (max-width: 1024px) {
+    .ListContainer {
+        max-width: 900px;
+    }
+
+    .createButtonFixed {
+        top: calc(var(--header-height, 70px) + 40px);
+        right: 16px;
+    }
+}

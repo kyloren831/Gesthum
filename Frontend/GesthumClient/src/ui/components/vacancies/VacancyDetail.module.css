@@ -1,0 +1,173 @@
+.container{
+  width: 100%;
+  max-width: 980px;
+  margin: 24px auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+  color: var(--Dark-blue);
+}
+
+/* Header */
+.headerRow{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.breadcrumb{
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Title */
+.title{
+  font-size: 28px;
+  margin: 4px 0 6px;
+  color: var(--Dark-blue);
+  font-weight: 800;
+}
+
+.subtitle{
+  color: #6b7280;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+/* Apply button (estilo similar a la imagen) */
+.applyButton{
+  background-color: var(--Dark-blue);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(16,44,94,0.12);
+  transition: background-color 0.15s, transform 0.08s;
+}
+.applyButton:hover{
+  background-color: #0b3b78;
+}
+.applyIcon{
+  font-size: 14px;
+}
+
+/* Info cards row */
+.infoCards{
+  display: flex;
+  gap: 12px;
+  margin: 18px 0;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.infoCard{
+  background: white;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 30%;
+  box-shadow: 0 2px 8px rgba(10,20,40,0.04);
+  min-width: 220px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* Published (inicio) — sutil diferencia */
+.infoCardPublished{
+  background: #fbfcff;
+  border-color: rgba(14,45,94,0.04);
+}
+.published{
+  color: #344054;
+  font-weight: 600;
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+/* Close (resaltada) — más énfasis visual */
+.infoCardClose{
+  background: linear-gradient(90deg, #fff5f5 0%, #ffffff 100%);
+  border: 1px solid rgba(185,28,28,0.12);
+  box-shadow: 0 6px 20px rgba(185,28,28,0.06);
+}
+.close{
+  color: #b91c1c; /* rojo más llamativo */
+  font-weight: 800;
+  font-size: 15px;
+}
+
+/* cambia el color del icono para la fecha de cierre */
+.closeIcon{
+  color: #b91c1c;
+}
+
+.infoIcon{
+  color: var(--Dark-blue);
+  font-size: 20px;
+  min-width: 28px;
+}
+
+.infoText{
+  display:flex;
+  flex-direction:column;
+}
+
+.infoLabel{
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.infoValue{
+  font-weight: 700;
+  color: var(--Dark-blue);
+  font-size: 14px;
+}
+
+/* Content cards */
+.contentCard{
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  margin-top: 18px;
+  box-shadow: 0 2px 8px rgba(10,20,40,0.04);
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.sectionTitle{
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: var(--Dark-blue);
+  font-weight: 700;
+}
+
+.paragraph{
+  color: #374151;
+  line-height: 1.6;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Requirements list */
+.requirementsList{
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #374151;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px){
+  .title{ font-size: 22px; }
+  .infoCards{ gap: 10px; }
+  .infoCard{ flex: 1 1 100%; min-width: auto; }
+  .container{ padding: 0 12px; }
+  .applyButton{ padding: 8px 12px; }
+}

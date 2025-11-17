@@ -1,0 +1,127 @@
+/* Card */
+.VacancyCard {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .VacancyCard:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(15,23,42,0.08);
+    }
+
+/* Header: título + estado */
+.CardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.Title {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+/* Estado: badge junto al título (derecha) */
+.StatusBadge {
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: white;
+    white-space: nowrap;
+}
+
+/* Colores según estado */
+.Open {
+    background-color: var(--accent-green);
+}
+
+.Closed {
+    background-color: var(--accent-red);
+}
+
+/* Truncado a 3 líneas */
+.Clamp3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    margin: 6px 0 0 0;
+    color: #111827;
+}
+
+/* Secciones y metadatos */
+.Section {
+    margin-top: 6px;
+}
+
+.Label {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.Meta {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* Botón secundario compartido (mismo look que .secondaryButton en AdminDashboard.module.css) 
+   y alias .DetailsButton para compatibilidad con código existente */
+.DetailsButton,
+.secondaryButton {
+    margin-top: 12px;
+    align-self: flex-start;
+    background: white;
+    border: 1px solid var(--Dark-blue);
+    color: var(--Dark-blue);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.12s ease, transform 0.12s ease, color 0.12s ease;
+    box-shadow: 0 2px 6px rgba(16,44,94,0.06);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.DetailsButton:hover,
+.secondaryButton:hover {
+    background: var(--Dark-blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(16,44,94,0.12);
+}
+
+.DetailsButton:focus,
+.secondaryButton:focus {
+    outline: 3px solid rgba(16,44,94,0.12);
+    outline-offset: 2px;
+}
+
+/* Accesibilidad / responsive tweaks */
+@media (max-width: 420px) {
+    .StatusBadge {
+        font-size: 0.65rem;
+        padding: 5px 8px;
+    }
+    .DetailsButton,
+    .secondaryButton {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+}

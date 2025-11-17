@@ -1,4 +1,4 @@
-import {  useEffect, useState, type ReactNode } from "react";
+import {  useEffect, useState, type ReactNode, useCallback } from "react";
 import type { UserClaims } from "../../core/entities/UserClaims";
 import { useLogin } from "../../ui/hooks/useLogin";
 import { AuthContext } from "../context/AuthContext";
@@ -12,7 +12,6 @@ export const AuthProvider = ({children}: Props)=>{
     const [loading,setLoading] = useState(false);
 
     const login = async (email:string,password:string) : Promise<UserClaims |null> => {
-        debugger;
         setLoading(true);
         const user : UserClaims | undefined = await loginUserHook(email,password);
         if(user){
@@ -24,7 +23,6 @@ export const AuthProvider = ({children}: Props)=>{
     }
 
     const logout = async () => {
-        debugger;
         await logoutUserHook();
         localStorage.removeItem('user');
         setUserClaims(null);
@@ -35,6 +33,13 @@ export const AuthProvider = ({children}: Props)=>{
         if(storedUser) setUserClaims(JSON.parse(storedUser));
     },[])
 
+    const markFirstLoginDone = useCallback(() => {
+        if(!userClaims) return;
+        const updated = { ...userClaims, isFirstLogin: false };
+        setUserClaims(updated);
+        localStorage.setItem('user', JSON.stringify(updated));
+    }, [userClaims]);
+
     return(
         <AuthContext.Provider value={{
             userClaims,
@@ -44,6 +49,7 @@ export const AuthProvider = ({children}: Props)=>{
             login,
             logout,
             isAuthenticated: !!userClaims,
+            markFirstLoginDone,
         }}>
             {children}
         </AuthContext.Provider>

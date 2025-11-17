@@ -1,5 +1,149 @@
 .body{
     background-color: #F4F6F8;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Contenedor que agrupa sidebar + main */
+.pageLayout {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Nueva columna que contiene Header + Main (a la derecha del sidebar) */
+.contentArea {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 100vh; /* hace que el contenido tenga al menos la altura del sidebar */
+    box-sizing: border-box;
+}
+
+/* Main ocupa el espacio restante */
+.mainContent {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex: 1;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.mainContent h2 {
+    width: 100%;
+    left: 1rem;
+    text-align: start;
+    color: var(--Dark-blue);
+    padding-bottom: 20px;
+}
+
+/* Tablets: apilar layout para más espacio vertical y ajustar paddings */
+@media (max-width: 1024px) {
+    .pageLayout {
+        gap: 12px;
+        padding: 16px;
+    }
+    .mainContent {
+        padding: 16px;
+    }
+}
+
+/* Mobile: sidebar encima y contenido debajo (columna) */
+@media (max-width: 768px) {
+    .pageLayout {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+    }
+    .contentArea {
+        min-height: auto;
+        width: 100%;
+    }
+    .mainContent {
+        padding: 12px;
+    }
+}
+
+/* ---------------------------
+   Secondary button (opuesto al primary)
+   - fondo blanco, borde y texto en color primario
+   - hover invierte a fondo primario y texto blanco
+   --------------------------- */
+.secondaryButton{
+    background: white;
+    color: var(--Dark-blue);
+    border: 1px solid var(--Dark-blue);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(16,44,94,0.06);
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.06s ease;
+    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.secondaryButton:hover{
+    background: var(--Dark-blue);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(16,44,94,0.12);
+}
+
+.secondaryButton:focus{
+    outline: 3px solid rgba(16,44,94,0.12);
+    outline-offset: 2px;
+}
+
+/* Primary button: inverso de secondaryButton (fondo primario, texto blanco; hover invierte) */
+.primaryButton{
+    background: var(--Dark-blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(16,44,94,0.12);
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.06s ease;
+    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.primaryButton:hover{
+    background: white;
+    color: var(--Dark-blue);
+    border: 1px solid var(--Dark-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(16,44,94,0.06);
+}
+
+.primaryButton:focus{
+    outline: 3px solid rgba(16,44,94,0.12);
+    outline-offset: 2px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .secondaryButton{
+        padding: 7px 10px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+    .primaryButton{
+        padding: 7px 10px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+}

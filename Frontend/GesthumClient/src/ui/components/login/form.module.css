@@ -1,25 +1,28 @@
-
 .formContainer{
     display: flex;
     flex-direction: column;
-    width: 30%;
+    /* ancho fluido y acotado */
+    width: clamp(280px, 35%, 480px);
+    margin: 0 auto;
 }
 
 .txtInput{
     border-radius: 1rem;
     border: 1px solid #E7E7E7;
-    height: 2rem;
-    width: 94%;
+    height: 2.2rem;
+    width: 100%;
     gap: 1rem;
     margin: 2% 0 2%;
-    font-size: 0.7lh;
-    padding-left: 5%;
+    font-size: 0.95rem;
+    padding-left: 3.2rem; /* espacio para icono absoluto */
+    transition: border-color .12s;
 }
 .txtInput:focus{
     outline-color: #d9cfae; /* azul */
     color: var(--Dark-blue);
+    border-color: var(--Dark-blue);
 }
-.checkbox{
+.checkbox{  
     padding: 0;
     width: 10%;
 }
@@ -28,8 +31,9 @@
 }
 .emailIcon{
     position: absolute;
-    top: 20px;
-    left:10px;
+    top: 50%;
+    transform: translateY(-50%);
+    left:12px;
     float: left;
 }
 .checkboxLabel{
@@ -49,33 +53,14 @@
 .subMenu a{
     color: var(--Dark-blue);
 }
-@media (max-width: 1280px) {
-     .txtInput{
-        padding-left: 7%;
-    }
-    .emailIcon{
-        top: 17px;
-    }
-}
-
-@media (max-width: 768px) {
-    .formContainer{
-         width: 75%;
-    }
-    .txtInput{
-        padding-left: 10%; /* sobrescribe la anterior */
-    }
-    .emailIcon{
-        top: 15px;
-        left:10px; /* sobrescribe la anterior */
-    }
-}
 
 .error{
     border: solid 1px red;
     background-color: #fcb7b7;
     color: white;
     text-align: center;
+    padding: 0.5rem;
+    border-radius: 6px;
 }
 
 .btnPrimary{
@@ -93,4 +78,27 @@
   color: var(--Dark-blue);
   cursor: pointer;
   border: solid 1px var(--Dark-blue);
+}
+
+/* Ajustes para tablets y móviles */
+@media (max-width: 1280px) {
+    .txtInput{
+        padding-left: 3rem;
+    }
+    .emailIcon{
+        left:10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .formContainer{
+         width: 90%;
+    }
+    .txtInput{
+        padding-left: 2.8rem;
+        font-size: 0.95rem;
+    }
+    .emailIcon{
+        left:10px;
+    }
 }

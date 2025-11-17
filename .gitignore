@@ -60,3 +60,4 @@ ehthumbs.db
 *.bak
 *.tmp
 *.log
+/Backend/GesthumServer/appsettings.json

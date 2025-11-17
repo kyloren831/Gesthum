@@ -1,5 +1,4 @@
-export interface Vacancy{
-    id: number;
+export interface VacancyDto {
     title: string;
     description: string;
     requirements: string;

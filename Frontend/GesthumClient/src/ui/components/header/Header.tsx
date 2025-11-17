@@ -1,21 +1,25 @@
 import Styles from './Header.module.css'
-import GesthumLogo from '../logo/gesthumLogo';
-import { AiOutlineSearch } from 'react-icons/ai';
 import { FaChevronDown } from 'react-icons/fa';
 import { LuLogOut } from 'react-icons/lu';
 import { CgProfile } from 'react-icons/cg';
 import { useAuth } from '../../hooks/useAuth';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useUserInfo } from '../../hooks/useUserInfo';
+import type { Admin } from '../../../core/entities/Admin';
+import type { Employee } from '../../../core/entities/Employee';
+
 interface props{
-    jobPosition:string;
-    name:string;
+    jobPosition?: string;
+    name?: string;
+    photo?: string;
 }
-const Header = ({jobPosition, name}:props) => {
+const Header = ({jobPosition, name, photo}:props) => {
 
     const {userClaims, logout} = useAuth();
+    const { adminInfo, employeeInfo } = useUserInfo();
     const navegate = useNavigate();
     const handleLogout = async () =>{
-        console.log(userClaims);
         try {
             await logout();
             navegate('/');
@@ -24,21 +28,72 @@ const Header = ({jobPosition, name}:props) => {
         }
     }
 
+    const [computedName, setComputedName] = useState<string | undefined>(name);
+    const [computedPhoto, setComputedPhoto] = useState<string | undefined>(photo);
+    const [computedJobPosition, setComputedJobPosition] = useState<string>(jobPosition ?? '');
+
+    useEffect(() => {
+        const resolveHeader = async () => {
+            // fallback inicial: props o claims
+            setComputedName(name ?? "No name");
+            setComputedPhoto(photo);
+
+            if (!userClaims) {
+                setComputedJobPosition(jobPosition ?? '');
+                return;
+            }
+
+            if (userClaims.role === 'Admin') {
+                // Admin -> obtener info completa (incluye foto)
+                setComputedJobPosition('Administrador de RH');
+                try {
+                    const adm: Admin | undefined = await adminInfo(Number.parseInt(userClaims.id));
+                    if (adm) {
+                        setComputedName(adm.name);
+                        setComputedPhoto(adm.photo);
+                    }
+                } catch (e) {
+                    // mantener valores por defecto si falla
+                }
+                return;
+            }
+
+            if (userClaims.role === 'Employee') {
+                // Employee -> obtener puesto y nombre
+                try {
+                    const emp: Employee | undefined = await employeeInfo(Number.parseInt(userClaims.id));
+                    if (emp) {
+                        setComputedName(emp.name ?? (name ?? ""));
+                        setComputedJobPosition(emp.position ?? (jobPosition ?? 'Empleado'));
+                    } else {
+                        setComputedJobPosition(jobPosition ?? 'Empleado');
+                    }
+                } catch {
+                    setComputedJobPosition(jobPosition ?? 'Empleado');
+                }
+                return;
+            }
+
+            // otros roles
+            setComputedJobPosition(jobPosition ?? '');
+        };
+
+        void resolveHeader();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userClaims, jobPosition, name, photo]);
+
   return (
     <div className={Styles.headerContainer}>
-        <div className={Styles.logoContainer}>
-            <GesthumLogo size='small'/>
-        </div>
-        <div className={Styles.inputContainer}>
-            <input className={Styles.searchInput} placeholder='Buscar'/>
-            <AiOutlineSearch className={Styles.searchIcon}/>
-        </div>
-        <img className={Styles.userImage} src="https://scontent.fjap1-1.fna.fbcdn.net/v/t39.30808-6/333333343_749062866849695_3886057689489806020_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=KhyvvvLtCksQ7kNvwFQBaoD&_nc_oc=AdkRhOvtbW-ohc-_y1IRzGuf3Wq6O4w7tk3gE_UVbqQ08aYmA47ydDdt64R3RWgzLqU&_nc_zt=23&_nc_ht=scontent.fjap1-1.fna&_nc_gid=Ts7py6w5xfVUxLG0YRA0HQ&oh=00_AfcWIMXesOrJGDtIkbsWZItmmCRstgeYLalmgmj5p9divw&oe=68FF7F10" alt="userImage"/>
+        <img
+            className={Styles.userImage}
+            src={ computedPhoto ?? `https://via.placeholder.com/40?text=${encodeURIComponent((computedName ?? 'U').charAt(0))}` }
+            alt="userImage"
+        />
         <div className={Styles.userInfo}>
-            <h1 className={Styles.userJobPosition}>{jobPosition}</h1>
+            <h1 className={Styles.userJobPosition}>{computedJobPosition}</h1>
             <div className={Styles.menu}>
                 <div className={Styles.userNameContainer}>
-                    <h2 className={Styles.userName}>{name}</h2>
+                    <h2 className={Styles.userName}>{computedName}</h2>
                     <FaChevronDown className={Styles.iconColor}></FaChevronDown>
                 </div>
                 <ul  className={Styles.subMenu}>
@@ -46,10 +101,6 @@ const Header = ({jobPosition, name}:props) => {
                     <li key={"logout"} className={Styles.subMenuItem} onClick={handleLogout}><LuLogOut/>Cerrar Sesión</li>
                 </ul>
             </div>
-           
-            
-
-
         </div>
     </div>
   )

@@ -4,8 +4,9 @@ import { useUserInfo } from "../../hooks/useUserInfo";
 import Styles from './AdminDashboard.module.css';
 import type { Admin } from "../../../core/entities/Admin";
 import { useAuth } from "../../hooks/useAuth";
+import Sidebar from "../../components/sidebar/Sidebar";
 
-const adminDashboard = () => {
+const AdminDashboard = () => {
 
   const {adminInfo} = useUserInfo();
   const [admin, setAdmin] = useState<Admin|undefined>(undefined);
@@ -14,18 +15,27 @@ const adminDashboard = () => {
   useEffect(()=>{
     const userInfo = async () =>{
       if(userClaims){
-      const info = await adminInfo(Number.parseInt(userClaims.id));
-      setAdmin(info);
+        const info = await adminInfo(Number.parseInt(userClaims.id));
+        setAdmin(info);
       }      
     }
     userInfo();
-  },[userClaims]);
+  },[userClaims, adminInfo]);
   
   return (
     <div className={Styles.body}>
-      <Header jobPosition='Administrador de RH' name={admin? admin.name : 'error al cargar datos'}/>
+      <div className={Styles.pageLayout}>
+        <Sidebar />
+        <div className={Styles.contentArea}>
+          <Header />
+          <main className={Styles.mainContent}>
+            <h2>Bienvenido, { admin?.name }</h2>
+            {/* VacanciesList removido para usar la página /vacantes */}
+          </main>
+        </div>
+      </div>
     </div>
   )
 }
 
-export default adminDashboard
+export default AdminDashboard

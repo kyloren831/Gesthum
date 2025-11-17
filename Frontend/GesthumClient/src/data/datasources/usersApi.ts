@@ -22,3 +22,23 @@ export const getEmployeeInfo = async (id:number):Promise<Employee|undefined> =>{
     const data : Employee = await response.json();
     return data;
 }
+
+/**
+ * Actualiza la foto del usuario (Admin o Employee).
+ * Envía el string photoUrl (puede ser dataURL/base64 o una URL) al backend.
+ */
+export const updateUserPhoto = async (id:number, role: 'Admin' | 'Employee', photoUrl: string): Promise<void> => {
+    const endpoint = role === 'Admin' ? `${import.meta.env.VITE_API_URL}/api/Users/${id}/admin` : `${import.meta.env.VITE_API_URL}/api/Users/${id}/employee`;
+    const response = await fetch(endpoint, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(photoUrl)
+    });
+    if(!response.ok){
+        const txt = await response.text();
+        throw new Error(`Update photo failed: ${txt}`);
+    }
+}

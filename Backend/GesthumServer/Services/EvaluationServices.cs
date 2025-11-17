@@ -7,7 +7,12 @@ using System.Text.Json;
 
 namespace GesthumServer.Services
 {
-    public class EvaluationServices
+    public interface IEvaluationServices
+    {
+        Task<Evaluation> CreateEvaluationForApplicationAsync(int applicationId, string model = "gemini-2.0-flash", CancellationToken cancellationToken = default);
+    }
+
+    public class EvaluationServices : IEvaluationServices
     {
         private readonly DbContextGesthum dbContext;
         private readonly IConfiguration config;
@@ -55,8 +60,11 @@ namespace GesthumServer.Services
 
             string rawText = string.Empty;
             int score = 0;
-            string summary = string.Empty;
+            string comments = string.Empty;
             var reasonsList = new List<string>();
+            var strengthsList = new List<string>();
+            var weaknessesList = new List<string>();
+            string modelResult = string.Empty;
 
             try
             {
@@ -83,18 +91,24 @@ namespace GesthumServer.Services
                 }
                 else
                 {
-                    // Intentar parsear JSON estricto desde la respuesta (esperamos JSON con score, summary, reasons)
+                    // Extraer sólo el JSON del texto devuelto por el modelo (quita fences y texto adicional)
+                    var jsonCandidate = ExtractJsonContent(rawText);
+
                     try
                     {
-                        using var doc = JsonDocument.Parse(rawText);
+                        using var doc = JsonDocument.Parse(jsonCandidate);
                         var root = doc.RootElement;
+
+                        if (root.TryGetProperty("result", out var resultProp) && resultProp.ValueKind == JsonValueKind.String)
+                            modelResult = resultProp.GetString() ?? string.Empty;
 
                         if (root.TryGetProperty("score", out var scoreProp) && scoreProp.ValueKind == JsonValueKind.Number)
                             score = scoreProp.GetInt32();
 
-                        summary = root.TryGetProperty("summary", out var summaryProp) && summaryProp.ValueKind == JsonValueKind.String
-                            ? summaryProp.GetString() ?? string.Empty
-                            : string.Empty;
+                        if (root.TryGetProperty("comments", out var commentsProp) && commentsProp.ValueKind == JsonValueKind.String)
+                            comments = commentsProp.GetString() ?? string.Empty;
+                        else if (root.TryGetProperty("summary", out var summaryProp) && summaryProp.ValueKind == JsonValueKind.String)
+                            comments = summaryProp.GetString() ?? string.Empty;
 
                         if (root.TryGetProperty("reasons", out var reasonsProp) && reasonsProp.ValueKind == JsonValueKind.Array)
                         {
@@ -104,12 +118,49 @@ namespace GesthumServer.Services
                                     reasonsList.Add(r.GetString() ?? string.Empty);
                             }
                         }
+
+                        if (root.TryGetProperty("strengths", out var strengthsProp) && strengthsProp.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var s in strengthsProp.EnumerateArray())
+                            {
+                                if (s.ValueKind == JsonValueKind.String)
+                                    strengthsList.Add(s.GetString() ?? string.Empty);
+                            }
+                        }
+
+                        if (root.TryGetProperty("weaknesses", out var weaknessesProp) && weaknessesProp.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var w in weaknessesProp.EnumerateArray())
+                            {
+                                if (w.ValueKind == JsonValueKind.String)
+                                    weaknessesList.Add(w.GetString() ?? string.Empty);
+                            }
+                        }
                     }
                     catch (JsonException)
                     {
-                        // No es JSON válido: usar todo el texto crudo como summary
-                        summary = rawText;
-                        logger.LogWarning("Respuesta de Gemini no es JSON válido para application {ApplicationId}.", applicationId);
+                        // Si no parsea, intentamos una extracción más agresiva y volvemos a parsear
+                        var fallback = AggressiveJsonExtract(rawText);
+                        try
+                        {
+                            using var doc = JsonDocument.Parse(fallback);
+                            var root = doc.RootElement;
+
+                            if (root.TryGetProperty("result", out var resultProp2) && resultProp2.ValueKind == JsonValueKind.String)
+                                modelResult = resultProp2.GetString() ?? string.Empty;
+
+                            if (root.TryGetProperty("score", out var scoreProp2) && scoreProp2.ValueKind == JsonValueKind.Number)
+                                score = scoreProp2.GetInt32();
+
+                            if (root.TryGetProperty("comments", out var commentsProp2) && commentsProp2.ValueKind == JsonValueKind.String)
+                                comments = commentsProp2.GetString() ?? string.Empty;
+                        }
+                        catch (JsonException)
+                        {
+                            // Si sigue fallando, guardamos el texto crudo (sin fences) en comments para auditoría
+                            comments = StripCodeFences(rawText).Trim();
+                            logger.LogWarning("Respuesta de Gemini no es JSON válido tras intentos de extracción para application {ApplicationId}.", applicationId);
+                        }
                     }
                 }
             }
@@ -124,6 +175,8 @@ namespace GesthumServer.Services
                     Comments = $"Error calling model: {ex.Message}",
                     Strengths = string.Empty,
                     Weaknesses = string.Empty,
+                    Score = 0,
+                    Reasons = string.Empty,
                     EvaluationDate = DateTime.UtcNow
                 };
 
@@ -132,39 +185,48 @@ namespace GesthumServer.Services
                 return errorEval;
             }
 
-            // Clasificar razones en strengths/weaknesses por heurística simple
-            var strengths = new List<string>();
-            var weaknesses = new List<string>();
-            var negativeKeywords = new[] { "no ", "not ", "lack", "insufficient", "weak", "missing", "falta", "sin " };
-
-            foreach (var reason in reasonsList)
+            // Si no vienen strengths/weaknesses derivarlos desde reasons
+            if (!strengthsList.Any() && !weaknessesList.Any() && reasonsList.Any())
             {
-                var lower = reason.ToLowerInvariant();
-                if (negativeKeywords.Any(k => lower.Contains(k)))
-                    weaknesses.Add(reason);
-                else
-                    strengths.Add(reason);
+                var negativeKeywords = new[] { "no ", "not ", "lack", "insufficient", "weak", "missing", "falta", "sin " };
+                foreach (var reason in reasonsList)
+                {
+                    var lower = reason.ToLowerInvariant();
+                    if (negativeKeywords.Any(k => lower.Contains(k)))
+                        weaknessesList.Add(reason);
+                    else
+                        strengthsList.Add(reason);
+                }
             }
 
-            // Determinar resultado según score (umbral configurable aquí)
-            var clampedScore = Math.Clamp(score, 0, 100);
+            // Determinar result (preferir valor explícito del modelo)
             string result;
-            const int passThreshold = 70;
-            if (clampedScore >= passThreshold)
-                result = "Passed";
-            else if (clampedScore > 0)
-                result = "Failed";
+            if (!string.IsNullOrWhiteSpace(modelResult))
+            {
+                result = modelResult;
+            }
             else
-                result = "Pending";
+            {
+                var clampedScore = Math.Clamp(score, 0, 100);
+                const int passThreshold = 70;
+                if (clampedScore >= passThreshold)
+                    result = "Passed";
+                else if (clampedScore > 0)
+                    result = "Failed";
+                else
+                    result = "Pending";
+            }
 
-            // Crear entidad Evaluation y persistir
+            var clamped = Math.Clamp(score, 0, 100);
             var evaluation = new Evaluation
             {
                 ApplicationId = applicationId,
                 Result = result,
-                Comments = string.IsNullOrWhiteSpace(summary) ? "No summary provided by model." : summary,
-                Strengths = strengths.Any() ? string.Join(" | ", strengths) : string.Empty,
-                Weaknesses = weaknesses.Any() ? string.Join(" | ", weaknesses) : string.Empty,
+                Comments = string.IsNullOrWhiteSpace(comments) ? "No comments provided by model." : comments,
+                Strengths = strengthsList.Any() ? string.Join(" | ", strengthsList) : string.Empty,
+                Weaknesses = weaknessesList.Any() ? string.Join(" | ", weaknessesList) : string.Empty,
+                Score = clamped,
+                Reasons = reasonsList.Any() ? string.Join(" | ", reasonsList) : string.Empty,
                 EvaluationDate = DateTime.UtcNow
             };
 
@@ -172,6 +234,64 @@ namespace GesthumServer.Services
             await dbContext.SaveChangesAsync(cancellationToken);
 
             return evaluation;
+        }
+
+        private static string StripCodeFences(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+
+            var t = text.Trim();
+
+            // Eliminar bloques ```...```
+            if (t.StartsWith("```"))
+            {
+                // quitar la primera línea (```json o ``` )
+                var firstNewline = t.IndexOf('\n');
+                if (firstNewline >= 0)
+                    t = t.Substring(firstNewline + 1);
+            }
+
+            // quitar trailing fences si existen
+            var closingFence = t.LastIndexOf("```");
+            if (closingFence >= 0)
+                t = t.Substring(0, closingFence);
+
+            return t.Trim();
+        }
+
+        private static string ExtractJsonContent(string text)
+        {
+            var cleaned = StripCodeFences(text);
+
+            var firstBrace = cleaned.IndexOf('{');
+            var lastBrace = cleaned.LastIndexOf('}');
+
+            if (firstBrace >= 0 && lastBrace > firstBrace)
+                return cleaned.Substring(firstBrace, lastBrace - firstBrace + 1);
+
+            // si no se encuentran llaves bien, devolver el cleaned text (intentaremos parsear de todas formas)
+            return cleaned;
+        }
+
+        private static string AggressiveJsonExtract(string text)
+        {
+            // like ExtractJsonContent but intenta eliminar cualquier prefijo/sufijo y localizar el JSON más grande posible
+            var cleaned = StripCodeFences(text);
+
+            // buscar primer '{' y el '}' correspondiente buscando hacia el final
+            var first = cleaned.IndexOf('{');
+            var last = cleaned.LastIndexOf('}');
+            if (first >= 0 && last > first)
+                return cleaned.Substring(first, last - first + 1);
+
+            // fallback: si hay corchetes ([]) devolver su contenido
+            var firstArr = cleaned.IndexOf('[');
+            var lastArr = cleaned.LastIndexOf(']');
+            if (firstArr >= 0 && lastArr > firstArr)
+                return cleaned.Substring(firstArr, lastArr - firstArr + 1);
+
+            return cleaned;
         }
 
         private static string BuildEvaluationPrompt(Vacancy vacancy, Resume resume)
@@ -196,16 +316,18 @@ WorkExperience:
 {resumeWorkExp}
 ";
 
-            // Instrucciones: pedir JSON estricto para facilitar parsing
+            // Instrucciones: exigir SOLO el JSON necesario para crear la entidad Evaluation
             var instructions = @"
-Compara la vacante con el currículum. Evalúa el ajuste entre la vacante y el candidato.
-Devuelve UN ÚNICO JSON válido con las propiedades:
- - score: número entero 0-100 que indique el grado de ajuste (100 = perfecto).
- - summary: texto corto explicando la evaluación.
- - reasons: array de strings con las razones más importantes (3 como máximo).
-Ejemplo de respuesta válida:
-{ ""score"": 78, ""summary"": ""Buen ajuste en habilidades técnicas"", ""reasons"": [""Coinciden las habilidades X, Y"", ""Experiencia en el sector Z""] }
-No incluyas texto adicional fuera del JSON.
+Devuelve ÚNICAMENTE un JSON válido (sin texto adicional) con estas propiedades:
+ - result: string, uno de ""Passed"", ""Failed"" o ""Pending"". (necesario)
+ - comments: string breve que será guardado en Evaluation.Comments. (necesario)
+ - strengths: array de strings (0-5) mapeado a Evaluation.Strengths. (recomendado)
+ - weaknesses: array de strings (0-5) mapeado a Evaluation.Weaknesses. (recomendado)
+ - score: entero 0-100 (opcional)
+ - reasons: array de strings (opcional, para auditoría)
+Ejemplo (respuesta EXACTA esperada, sin fences ni texto extra):
+{ ""result"": ""Passed"", ""comments"": ""Buen ajuste en habilidades técnicas."", ""strengths"": [""C#"", "".NET""], ""weaknesses"": [""Poca experiencia en cloud""], ""score"": 85, ""reasons"": [""Coinciden las habilidades X, Y""] }
+IMPORTANTE: NO incluyas explicaciones, encabezados, ni bloques de código. SOLO el JSON arriba descrito.
 ";
 
             return $"{instructions}\n{vacancyText}\n{resumeText}";

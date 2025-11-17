@@ -48,3 +48,28 @@ color: var(--Dark-blue);
     align-items: end;
     gap: 3px;
 }
+
+@media (max-width: 768px) {
+    .footerContainer{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+    .iconContainer, .subtitle, .contact, .links {
+        grid-area: auto;
+        margin: 0;
+        text-align: center;
+    }
+    .links{
+        justify-content: center;
+        margin-right: 0;
+    }
+    .contact ul {
+        display: inline-block;
+        padding: 0;
+    }
+    .contact ul li{
+        justify-content: center;
+    }
+}

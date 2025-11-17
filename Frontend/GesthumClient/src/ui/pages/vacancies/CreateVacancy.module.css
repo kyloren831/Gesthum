@@ -1,0 +1,124 @@
+.pageContainer {
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.pageContainer h2 {
+  font-size: 20px;
+  margin: 0 0 6px 0;
+  color: var(--Dark-blue);
+  font-weight: 700;
+}
+
+.form {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(2,6,23,0.06), 0 8px 24px rgba(2,6,23,0.04);
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Etiquetas */
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
+/* Inputs y textarea */
+.form input[type="text"],
+.form input[type="datetime-local"],
+.form textarea,
+.form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow 140ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.form input::placeholder,
+.form textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Focus */
+.form input:focus,
+.form textarea:focus,
+.form input[type="datetime-local"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.08);
+  background: #fff;
+}
+
+/* Textarea */
+.form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Checkbox */
+.checkboxLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #374151;
+}
+
+/* Botones */
+.buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+/* Botón primario */
+.primary {
+  background: linear-gradient(180deg,#2563eb,#1e40af);
+  color: #ffffff;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(37,99,235,0.12);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,99,235,0.14); }
+.primary:active { transform: translateY(0); }
+
+/* Botón secundario */
+.secondary {
+  background: #f3f4f6;
+  color: #111827;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid #e6e7eb;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Mensaje de error / ayuda */
+.fieldError {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* Responsive: reducir padding y gaps en pantallas pequeñas */
+@media (max-width: 640px) {
+  .pageContainer { padding: 16px; }
+  .form { padding: 14px; gap: 12px; }
+  .primary, .secondary { padding: 8px 12px; }
+}
