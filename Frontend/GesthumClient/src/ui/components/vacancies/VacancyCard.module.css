@@ -32,22 +32,85 @@
 }
 
 /* Estado: badge junto al título (derecha) */
+/* Base visual, compacto */
 .StatusBadge {
     font-size: 0.72rem;
     padding: 6px 10px;
     border-radius: 999px;
     color: white;
     white-space: nowrap;
+
+    /* Layout para iconos/texto si se añade */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    /* transición suave para interacciones */
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    box-shadow: none;
+    border: 1px solid transparent;
 }
 
-/* Colores según estado */
+/* Interactivo solo cuando tiene role="button" (solo Admin verá éste comportamiento) */
+.StatusBadge[role="button"] {
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.08);
+}
+
+/* Hover / focus visual para indicar clicable */
+.StatusBadge[role="button"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(2,6,23,0.14);
+    opacity: 0.98;
+}
+
+/* Estado activo al presionar */
+.StatusBadge[role="button"]:active {
+    transform: translateY(-1px) scale(0.995);
+}
+
+/* Focus bien visible para accesibilidad */
+.StatusBadge[role="button"]:focus,
+.StatusBadge[role="button"]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(11,95,255,0.12), 0 6px 18px rgba(2,6,23,0.12);
+    border-color: rgba(11,95,255,0.14);
+}
+
+/* Pequeña etiqueta "pointer" en mobile cuando se quiere reforzar interacción táctil */
+@media (hover: none) {
+    .StatusBadge[role="button"] {
+        transform: none;
+    }
+}
+
+/* Colores según estado (ligeramente enriquecidos para botón) */
 .Open {
-    background-color: var(--accent-green);
+    background: linear-gradient(135deg, var(--accent-green), rgba(8,140,82,0.9));
 }
 
 .Closed {
-    background-color: var(--accent-red);
+    background: linear-gradient(135deg, var(--accent-red), rgba(220,38,38,0.92));
 }
+
+/* Nuevo contenedor de acciones para alinear botones */
+.Actions {
+    margin-top: auto;
+    align-items: center;
+}
+
+/* Normalizar tamaño y alineación de botones dentro de la card */
+    .Actions button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 8px 12px;
+        gap: 8px;
+        margin-right: 8px;
+        margin-top: auto;
+    }
 
 /* Truncado a 3 líneas */
 .Clamp3 {

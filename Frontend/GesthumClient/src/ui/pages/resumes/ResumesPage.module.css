@@ -1,0 +1,233 @@
+.body {
+  min-height: 100vh;
+}
+
+.pageLayout {
+  display: flex;
+  gap: 16px;
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContent {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 ;
+  width: 100%;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+        /* Contenedor para las acciones en la esquina superior derecha */
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Ajustes comunes para botones en línea */
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+}
+
+/* Reutilizamos createButtonInline definido anteriormente */
+.createButtonInline {
+  padding: 7px 12px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Asegurar visibilidad y tamaño de los iconos SVG dentro de botones
+   Aplicado sobre nuestras clases locales que acompañan los botones globales
+   (ej. LayoutStyles.primaryButton + createButtonInline). */
+.actionsRow svg,
+.actionBtn svg,
+.createButtonInline svg,
+.createButtonFixed svg {
+  display: inline-block !important;
+  width: 1em !important;
+  height: 1em !important;
+  vertical-align: middle !important;
+  color: inherit !important;
+}
+
+/* Forzamos que los paths/circles/polygons dentro del SVG tomen el color actual.
+   Esto cubre iconos SVG que usan fill o stroke. */
+.actionsRow svg * ,
+.actionBtn svg * ,
+.createButtonInline svg * ,
+.createButtonFixed svg * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* espacio entre icono y texto (utilizado en varios botones) */
+.iconSpacing {
+  margin-right: 8px;
+}
+
+/* Botón fijo estilo similar a VacanciesList.createButtonFixed */
+.createButtonFixed {
+  position: fixed;
+  right: 24px;
+  top: calc(var(--header-height, 70px) + 70px);
+
+  /* Layout / tamaño */
+  padding: 8px 14px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), opacity 120ms, filter 120ms;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 210;
+}
+
+/* Hover / active */
+.createButtonFixed:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.createButtonFixed:active {
+  transform: translateY(0);
+}
+
+/* Focus visible para accesibilidad */
+.createButtonFixed:focus-visible {
+  outline: 3px solid rgba(77,144,255,0.24);
+  outline-offset: 4px;
+}
+
+/* espacio entre icono y texto */
+.iconSpacing {
+  margin-right: 8px;
+}
+
+/* Aseguramos que el título esté pegado a la izquierda */
+.ListContainer > h2 {
+  margin: 0;
+  text-align: left;
+}
+
+/* Loader / mensajes y resto del CSS existente */
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(16,24,40,0.06);
+}
+
+.cardTitle {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 0.95rem;
+  color: #111827;
+}
+
+.message {
+  padding: 12px;
+  color: #374151;
+}
+
+.error {
+  padding: 12px;
+  color: #b91c1c;
+  background: #fff6f6;
+  border-radius: 6px;
+}
+
+.workList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.workItem {
+  padding: 12px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.workHeader {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.workMeta {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.company {
+  color: #374151;
+}
+
+.workDescription {
+  margin: 0;
+  color: #374151;
+}
+
+/* Responsive: en pantallas pequeñas el botón fijo se convierte en FAB */
+@media (max-width: 768px) {
+  .createButtonFixed {
+    right: 16px !important;
+    bottom: calc(env(safe-area-inset-bottom, 20px) + 12px) !important;
+    top: auto !important;
+    padding: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .createButtonFixed .iconSpacing {
+    display: none;
+  }
+
+  .mainContent {
+    padding: 16px;
+  }
+}

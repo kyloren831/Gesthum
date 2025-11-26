@@ -21,6 +21,13 @@
   align-items: start;
 }
 
+/* Breadcrumb: igual que en VacancyDetail.module.css */
+.breadcrumb {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
 /* Etiquetas */
 .form label {
   display: flex;
@@ -114,6 +121,12 @@
   color: #dc2626;
   font-size: 12px;
   margin-top: 6px;
+}
+
+.errorMessage {
+  color: #dc2626;
+  margin-top: 8px;
+  font-weight: 600;
 }
 
 /* Responsive: reducir padding y gaps en pantallas pequeñas */

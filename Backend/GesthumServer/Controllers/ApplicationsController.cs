@@ -16,12 +16,58 @@ namespace GesthumServer.Controllers
         {
             this.applicationsServices = applicationsServices;
         }
+
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateApplication([FromBody] PostApplicationDTO postApplicationDTO)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateApplication([FromBody] PostApplicationDTO postApplicationDTO, CancellationToken cancellationToken = default)
         {
             var createdApplication = await applicationsServices.CreateApplication(postApplicationDTO);
-            return CreatedAtAction(nameof(CreateApplication), new { id = createdApplication.Id }, createdApplication);
+            // Usar la acción que espera el id que realmente tenemos (vacantId)
+            return CreatedAtAction(nameof(GetApplicationsByVacantId), new { vacantId = createdApplication.VacantId }, createdApplication);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [ProducesResponseType(typeof(List<GetApplicationDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllApplications(CancellationToken cancellationToken = default)
+        {
+            var list = await applicationsServices.GetAllApplications();
+            return Ok(list);
+        }
+
+       
+
+        [HttpGet("employee/{employeeId:int}")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<GetApplicationDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetApplicationsByEmployeeId([FromRoute] int employeeId, CancellationToken cancellationToken = default)
+        {
+            var apps = await applicationsServices.GetApplicationsByEmployeeId(employeeId);
+            return Ok(apps);
+        }
+
+        [HttpGet("vacant/{vacantId:int}")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<GetApplicationDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetApplicationsByVacantId([FromRoute] int vacantId, CancellationToken cancellationToken = default)
+        {
+            var apps = await applicationsServices.GetApplicationsByVacantId(vacantId);
+            return Ok(apps);
+        }
+
+        [HttpDelete("{applicationId:int}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteApplication([FromRoute] int applicationId, CancellationToken cancellationToken = default)
+        {
+            await applicationsServices.DeleteApplication(applicationId);
+            return NoContent();
         }
     }
 }

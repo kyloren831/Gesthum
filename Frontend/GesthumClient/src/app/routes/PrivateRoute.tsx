@@ -2,6 +2,8 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../ui/hooks/useAuth'
 
+export const EMPLOYEE_PROFILE_ROUTE = '/employees/profile';
+
 interface PrivateRouteProps {
     allowedRoles?:string[],
     children:React.ReactNode

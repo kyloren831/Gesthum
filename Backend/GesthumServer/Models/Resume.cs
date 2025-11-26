@@ -16,5 +16,8 @@ namespace GesthumServer.Models
         [JsonIgnore]
         public Employee Employee { get; set; }
         public IEnumerable<WorkExperience>? WorkExperience { get; set; }
+
+        // Nuevo: indica si el CV está activo o ha sido desactivado en lugar de borrarse.
+        public bool IsActive { get; set; } = true;
     }
 }

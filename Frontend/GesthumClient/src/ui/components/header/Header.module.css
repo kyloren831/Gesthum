@@ -7,12 +7,13 @@
     background-color: white;
     display: flex;
     align-items: center;
-    box-shadow: 10px 10px 10px rgb(0, 0, 0,0.1);
+    justify-content: flex-end; /* asegurar contenido alineado a la derecha */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     padding: 0 1rem;
     box-sizing: border-box;
 }
 
-
+/* Imagen del usuario: colocada al final (orden) para que quede a la derecha del grupo *//* Imagen del usuario: colocada al final (orden) para que quede a la derecha del grupo *//* Imagen del usuario: colocada al final (orden) para que quede a la derecha del grupo */ 
 .userImage{
     width: 40px;
     height: 40px;

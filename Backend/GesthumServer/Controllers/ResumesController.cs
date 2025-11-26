@@ -48,5 +48,14 @@ namespace GesthumServer.Controllers
            await resumesServices.DeleteResumeByEmployeeId(employeeId);
            return NoContent();
         }
+
+        // Nuevo: Delete resume por resume Id
+        [HttpDelete("id/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteResumeById(int id)
+        {
+           await resumesServices.DeleteResumeById(id);
+           return NoContent();
+        }
     }
 }

@@ -3,5 +3,6 @@ import type { Employee } from "../../core/entities/Employee";
 
 export interface IUserRepository{
     getAdminInfo(id:number) :Promise<Admin | undefined>;
-    getEmployeeInfo(id:number) :Promise<Employee | undefined>;
+    getEmployeeInfo(id: number): Promise<Employee | undefined>;
+    updateUserPhoto(id: number, role: 'Admin' |'Employee' ,photoUrl: string): Promise<void>;
 }

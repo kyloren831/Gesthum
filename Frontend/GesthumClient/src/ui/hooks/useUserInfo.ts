@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import type { Admin } from "../../core/entities/Admin";
 import { getAdminInfo, getEmployeeInfo } from "../../core/usecases/usersInfo";

@@ -233,6 +233,21 @@ namespace GesthumServer.Services
             await dbContext.Set<Evaluation>().AddAsync(evaluation, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
+            // Actualizar el estado de la aplicación al resultado de la evaluación
+            try
+            {
+                // application fue cargada con AsNoTracking, así que adjuntamos una instancia mínima para actualizar solo Status
+                var appToUpdate = new Application { Id = applicationId, Status = result };
+                dbContext.Attach(appToUpdate);
+                dbContext.Entry(appToUpdate).Property(a => a.Status).IsModified = true;
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // No interrumpir el flujo si la actualización del estado falla, pero registrar el error
+                logger.LogError(ex, "Error updating application status for application {ApplicationId}", applicationId);
+            }
+
             return evaluation;
         }
 
@@ -319,7 +334,7 @@ WorkExperience:
             // Instrucciones: exigir SOLO el JSON necesario para crear la entidad Evaluation
             var instructions = @"
 Devuelve ÚNICAMENTE un JSON válido (sin texto adicional) con estas propiedades:
- - result: string, uno de ""Passed"", ""Failed"" o ""Pending"". (necesario)
+ - result: string, uno de ""Passed"" o ""Failed"". (necesario)
  - comments: string breve que será guardado en Evaluation.Comments. (necesario)
  - strengths: array de strings (0-5) mapeado a Evaluation.Strengths. (recomendado)
  - weaknesses: array de strings (0-5) mapeado a Evaluation.Weaknesses. (recomendado)

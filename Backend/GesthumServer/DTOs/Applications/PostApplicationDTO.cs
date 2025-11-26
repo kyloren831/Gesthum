@@ -2,7 +2,7 @@
 {
     public class PostApplicationDTO
     {
-        public int ResumeId { get; set; }
+        public int EmployeeId { get; set; }
         public int VacantId { get; set; }
     }
 }

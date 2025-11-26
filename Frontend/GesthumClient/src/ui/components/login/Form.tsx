@@ -15,18 +15,14 @@ const Form = () => {
   const { login, loading, setLoading } = useAuth();
   const [activeModal,setActiveModal] = useState(loading);
   const navegate = useNavigate();
-  const { } = useAuth();
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    debugger;
     setErrorMsg(null);
 
     try {
       const user = await login(email,password);
       if(user){
-        debugger;
         setLoading(false);
         return user.role == 'Admin'? navegate('/adminDash') : navegate ('/emplDash')
       }

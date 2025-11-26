@@ -17,11 +17,18 @@ namespace GesthumServer.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Additional configuration can be added here if needed
+            // WorkExperience relación (existente)
             modelBuilder.Entity<WorkExperience>()
                 .HasOne(wke=> wke.Resume)
                 .WithMany(r=> r.WorkExperience)
                 .HasForeignKey(wke=> wke.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configurar explícitamente relación uno-a-muchos entre Employee y Resume
+            modelBuilder.Entity<Resume>()
+                .HasOne(r => r.Employee)
+                .WithMany(e => e.Resumes)
+                .HasForeignKey(r => r.EmployeeId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -163,6 +163,9 @@ namespace GesthumServer.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Languages")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -177,8 +180,7 @@ namespace GesthumServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Resumes");
                 });
@@ -290,8 +292,8 @@ namespace GesthumServer.Migrations
             modelBuilder.Entity("GesthumServer.Models.Resume", b =>
                 {
                     b.HasOne("GesthumServer.Models.Employee", "Employee")
-                        .WithOne("Resume")
-                        .HasForeignKey("GesthumServer.Models.Resume", "EmployeeId")
+                        .WithMany("Resumes")
+                        .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -311,7 +313,7 @@ namespace GesthumServer.Migrations
 
             modelBuilder.Entity("GesthumServer.Models.Employee", b =>
                 {
-                    b.Navigation("Resume");
+                    b.Navigation("Resumes");
                 });
 
             modelBuilder.Entity("GesthumServer.Models.Resume", b =>

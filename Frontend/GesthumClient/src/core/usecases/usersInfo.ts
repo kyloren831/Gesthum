@@ -11,3 +11,8 @@ export const getEmployeeInfo = async (id:number) : Promise<Employee | undefined>
     const repo = new UserRepository();
     return await repo.getEmployeeInfo(id);
 }
+
+export const updateUserPhoyo = async (id: number, role: 'Admin' | 'Employee',photo: string): Promise<void> => {
+    const repo = new UserRepository();
+    return await repo.updateUserPhoto(id, role, photo);
+}

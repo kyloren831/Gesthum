@@ -1,0 +1,72 @@
+.row td {
+  padding: 12px 8px;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.colTitle {
+  max-width: 420px;
+  padding-right: 12px;
+}
+
+.title {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.desc {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.colLocation {
+  width: 160px;
+  color: #374151;
+}
+
+.badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.open {
+  color: #065f46;
+  background: rgba(16,185,129,0.08);
+}
+
+.closed {
+  color: #7f1d1d;
+  background: rgba(239,68,68,0.06);
+}
+
+.appStatus {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.appDate {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.colActions {
+  width: 180px;
+}
+
+.withdrawButton {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #b91c1c;
+}

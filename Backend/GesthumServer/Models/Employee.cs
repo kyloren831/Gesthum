@@ -11,6 +11,8 @@ namespace GesthumServer.Models
         public string Position { get; set; }
         public string Department { get; set; }
         public string? PhotoUrl { get; set; }
-        public Resume? Resume { get; set; }
+
+        // Cambiado a colección para permitir múltiples Resumes por Employee
+        public ICollection<Resume> Resumes { get; set; } = new List<Resume>();
     }
 }

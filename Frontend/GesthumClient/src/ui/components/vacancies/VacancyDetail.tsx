@@ -1,26 +1,67 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import Styles from './VacancyDetail.module.css';
+import AdminStyles from '../../pages/admins/AdminDashboard.module.css';
 import type { Vacancy } from '../../../core/entities/Vacancy';
 import { useAuth } from '../../hooks/useAuth';
 import { FaMapMarkerAlt, FaCalendarAlt, FaPaperPlane } from 'react-icons/fa';
+import { useCreateApplication } from '../../hooks/applications/useCreateApplication';
 
 type Props = {
   vacancy: Vacancy;
   onApply?: (vacancyId: number) => Promise<void> | void;
+  onEdit?: (vacancy: Vacancy) => void;
 };
 
 const formatDate = (iso?: string) =>
   iso ? new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
 
-const VacancyDetail: React.FC<Props> = ({ vacancy, onApply }) => {
+const VacancyDetail: React.FC<Props> = ({ vacancy, onApply, onEdit }) => {
   const { userClaims } = useAuth();
+  const isAdmin = userClaims?.role === 'Admin';
 
-  const handleApply = async () => {
+  const { createApplication, loading } = useCreateApplication();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const handleEdit = () => {
+    if (onEdit) onEdit(vacancy);
+  };
+
+  const handleApplyClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmApply = async () => {
+    if (!userClaims) {
+      alert('Debes estar autenticado para postularte.');
+      setShowConfirmModal(false);
+      return;
+    }
+
+    const employeeId = Number(userClaims.id);
+    if (Number.isNaN(employeeId)) {
+      alert('ID de empleado inválido.');
+      setShowConfirmModal(false);
+      return;
+    }
+
     try {
-      if (onApply) await onApply(vacancy.id);
-      else console.log('Aplicar a vacante', vacancy.id);
-    } catch (e) {
-      console.error(e);
+      const payload = { employeeId, vacantId: vacancy.id };
+      console.debug('Enviando aplicación:', payload);
+      await createApplication(payload);
+      // notificar al padre si lo desea
+      if (onApply) {
+        try {
+          await onApply(vacancy.id);
+        } catch (e) {
+          console.error('onApply callback falló:', e);
+        }
+      }
+      alert('Postulación completada correctamente.');
+    } catch (err: any) {
+      console.error(err);
+      alert('Error al postular: ' + (err?.message ?? 'No se pudo completar la postulación'));
+    } finally {
+      setShowConfirmModal(false);
     }
   };
 
@@ -35,12 +76,26 @@ const VacancyDetail: React.FC<Props> = ({ vacancy, onApply }) => {
     <div className={Styles.container}>
       <div className={Styles.headerRow}>
         <div className={Styles.breadcrumb}>Vacantes &gt; {vacancy.title}</div>
-        {showApplyButton && (
-          <button className={Styles.applyButton} onClick={handleApply} aria-label="Postularme">
-            <FaPaperPlane className={Styles.applyIcon} />
-            Postularme
-          </button>
-        )}
+
+        {/* Acciones: editar para Admin, postular para Employee */}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {isAdmin && (
+            <button
+              className={AdminStyles.primaryButton}
+              onClick={handleEdit}
+              aria-label={`Editar vacante ${vacancy.title}`}
+            >
+              Editar
+            </button>
+          )}
+
+          {showApplyButton && (
+            <button className={Styles.applyButton} onClick={handleApplyClick} aria-label="Postularme">
+              <FaPaperPlane className={Styles.applyIcon} />
+              Postularme
+            </button>
+          )}
+        </div>
       </div>
 
       <h1 className={Styles.title}>{vacancy.title}</h1>
@@ -89,6 +144,59 @@ const VacancyDetail: React.FC<Props> = ({ vacancy, onApply }) => {
           <p className={Styles.paragraph}>{vacancy.requirements}</p>
         )}
       </section>
+
+      {/* Modal de confirmación */}
+      {showConfirmModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirmar postulación"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+          }}
+        >
+          <div
+            style={{
+              width: 520,
+              maxWidth: '95%',
+              background: 'white',
+              borderRadius: 8,
+              padding: 20,
+              boxShadow: '0 6px 24px rgba(0,0,0,0.2)',
+            }}
+          >
+            <h2 style={{ marginTop: 0 }}>Confirmar postulación</h2>
+            <p>
+              Vas a postularte a la vacante <strong>{vacancy.title}</strong> con el CV que tengas activo. ¿Deseas
+              continuar?
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className={AdminStyles.secondaryButton}
+                style={{ minWidth: 120 }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmApply}
+                disabled={loading}
+                className={AdminStyles.primaryButton}
+                style={{ minWidth: 120 }}
+              >
+                {loading ? 'Enviando...' : 'Confirmar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

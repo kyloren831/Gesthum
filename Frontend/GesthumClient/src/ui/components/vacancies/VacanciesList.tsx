@@ -9,9 +9,10 @@ import { useAuth } from '../../hooks/useAuth';
 interface Props {
   onCreate?: () => void;
   onViewDetails?: (vacancy: Vacancy) => void;
+  onEdit?: (vacancy: Vacancy) => void;
 }
 
-const VacanciesList = ({ onCreate, onViewDetails }: Props) => {
+const VacanciesList = ({ onCreate, onViewDetails, onEdit }: Props) => {
     const { vacancies, loading, error } = useVacancies();
     const { userClaims } = useAuth();
 
@@ -23,13 +24,25 @@ const VacanciesList = ({ onCreate, onViewDetails }: Props) => {
         console.log('Ver detalles vacante', vacancy.id);
     };
 
+    const handleEdit = (vacancy: Vacancy) => {
+        if (onEdit) onEdit(vacancy);
+    };
+
     // Visibilidad decidida por el rol real del usuario (Admin)
     const showCreateButton = userClaims?.role === 'Admin';
 
+    // Si el usuario es Employee, mostrar solo vacantes activas
+    const visibleVacancies = userClaims?.role === 'Employee'
+      ? vacancies.filter(v => v.state)
+      : vacancies;
+
     return (
         <div className={Styles.ListContainer}>
+            <div style={{ marginBottom: 12, color: '#6b7280', fontSize: 13 }}>
+                Vacantes &gt; Lista
+            </div>
             <div className={Styles.headerRow}>
-                <h2>Lista de Vacantes</h2>
+                <h2>Vacantes</h2>
             </div>
 
             {showCreateButton && (
@@ -53,10 +66,12 @@ const VacanciesList = ({ onCreate, onViewDetails }: Props) => {
                 </div>
             ) : (
                 <div className={Styles.ListGrid}>
-                    {!loading && vacancies.length === 0 && !error && <p>No hay vacantes disponibles.</p>}
+                    {!loading && visibleVacancies.length === 0 && !error && (
+                      <p>{userClaims?.role === 'Employee' ? 'No hay vacantes activas.' : 'No hay vacantes disponibles.'}</p>
+                    )}
                     {error && <p>Error al cargar vacantes: {error}</p>}
-                    {vacancies.map(v => (
-                        <VacancyCard key={v.id} v={v} handleViewDetails={handleViewDetails}/>
+                    {visibleVacancies.map(v => (
+                        <VacancyCard key={v.id} v={v} handleViewDetails={handleViewDetails} onEdit={handleEdit} />
                     ))}
                 </div>
             )}

@@ -12,15 +12,30 @@ const VacanciesPage: React.FC = () => {
   const { userClaims } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
   const [selectedVacancy, setSelectedVacancy] = useState<Vacancy | null>(null);
+  const [editingVacancy, setEditingVacancy] = useState<Vacancy | null>(null);
 
   const canCreate = userClaims?.role === 'Admin';
 
   const handleViewDetails = (vacancy: Vacancy) => {
     setSelectedVacancy(vacancy);
+    setShowCreate(false);
+    setEditingVacancy(null);
   };
 
   const handleCloseDetails = () => {
     setSelectedVacancy(null);
+  };
+
+  const handleCreate = () => {
+    setEditingVacancy(null);
+    setSelectedVacancy(null);
+    setShowCreate(true);
+  };
+
+  const handleEdit = (vacancy: Vacancy) => {
+    setEditingVacancy(vacancy);
+    setSelectedVacancy(null);
+    setShowCreate(true);
   };
 
   return (
@@ -29,12 +44,25 @@ const VacanciesPage: React.FC = () => {
         <Sidebar />
         <div className={Styles.contentArea}>
           <Header />
-          <main className={Styles.mainContent}>
+                  <main className={Styles.mainContent}>
+                      
             {showCreate ? (
-              <CreateVacancyForm
-                onCancel={() => setShowCreate(false)}
-                onSaved={() => setShowCreate(false)}
-              />
+                          <>
+                              <button
+                                  className={Styles.secondaryButton}
+                                  onClick={() => { setShowCreate(false); setEditingVacancy(null); }}
+                                  aria-label="Volver a la lista"
+                              >
+                                  ← Volver a lista
+                              </button>
+
+                              <CreateVacancyForm
+                                  onCancel={() => { setShowCreate(false); setEditingVacancy(null); }}
+                                  onSaved={() => { setShowCreate(false); setEditingVacancy(null); }}
+                                  mode={editingVacancy ? 'edit' : 'create'}
+                                  initialVacancy={editingVacancy}
+                              />
+                          </>
             ) : selectedVacancy ? (
               <>
                 <button
@@ -44,10 +72,10 @@ const VacanciesPage: React.FC = () => {
                 >
                   ← Volver a lista
                 </button>
-                <VacancyDetail vacancy={selectedVacancy} onApply={async (id) => { console.log('Aplicando a', id); }} />
+                <VacancyDetail vacancy={selectedVacancy} onApply={async (id) => { console.log('Aplicando a', id); }} onEdit={handleEdit} />
               </>
             ) : (
-              <VacanciesList onCreate={() => setShowCreate(true)} canCreate={canCreate} onViewDetails={handleViewDetails} />
+              <VacanciesList onCreate={handleCreate} onEdit={handleEdit} onViewDetails={handleViewDetails} />
             )}
           </main>
         </div>

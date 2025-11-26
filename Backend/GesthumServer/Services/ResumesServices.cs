@@ -8,6 +8,7 @@ namespace GesthumServer.Services
     {
         Task<Resume> CreateResume(PostResume resume);
         Task DeleteResumeByEmployeeId(int id);
+        Task DeleteResumeById(int id);
         Task<Resume> GetResumeByEmployeeId(int id);
         Task<Resume> UpdateResume(int id, PostResume updatedResume);
     }
@@ -28,11 +29,12 @@ namespace GesthumServer.Services
         {
             ValidateResume(resume);
 
+            // Sólo impedir creación si ya existe un resume activo para el empleado
             var resumeExists = await context.Resumes.AsNoTracking()
-                .AnyAsync(r => r.EmployeeId == resume.EmployeeId);
+                .AnyAsync(r => r.EmployeeId == resume.EmployeeId && r.IsActive);
 
             if (resumeExists)
-                throw new InvalidOperationException("Resume for this employee already exists");
+                throw new InvalidOperationException("Resume activo para este empleado ya existe");
 
             var newResume = new Resume
             {
@@ -41,7 +43,8 @@ namespace GesthumServer.Services
                 AcademicTraining = resume.AcademicTraining,
                 Skills = resume.Skills,
                 CreationDate = DateTime.UtcNow,
-                Languages = resume.Languages
+                Languages = resume.Languages,
+                IsActive = true
             };
 
             await context.Resumes.AddAsync(newResume);
@@ -57,15 +60,17 @@ namespace GesthumServer.Services
         }
 
         /// <summary>
-        /// Gets a resume by employee ID.
+        /// Gets a resume by employee ID (sólo activo).
         /// </summary>
         public async Task<Resume> GetResumeByEmployeeId(int id)
         {
-            var resume = await context.Resumes.Include(x=>x.WorkExperience).AsNoTracking()
-                .FirstOrDefaultAsync(r => r.EmployeeId == id);
+            var resume = await context.Resumes
+                .Include(x => x.WorkExperience)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.EmployeeId == id && r.IsActive);
 
             if (resume == null)
-                throw new KeyNotFoundException("Resume not found for this employee");
+                throw new KeyNotFoundException("Resume activo no encontrado para este empleado");
 
             return resume;
         }
@@ -100,7 +105,9 @@ namespace GesthumServer.Services
         }
 
         /// <summary>
-        /// Deletes a resume by employee ID.
+        /// Deletes a resume by employee ID:
+        /// - si existe alguna Application asociada, se desactiva (IsActive = false)
+        /// - si no, se elimina físicamente.
         /// </summary>
         public async Task DeleteResumeByEmployeeId(int id)
         {
@@ -110,7 +117,47 @@ namespace GesthumServer.Services
             if (existingResume == null)
                 throw new KeyNotFoundException("User has no resume");
 
-            context.Resumes.Remove(existingResume);
+            var hasApplications = await context.Applications
+                .AnyAsync(a => a.ResumeId == existingResume.Id);
+
+            if (hasApplications)
+            {
+                // Desactivar en lugar de eliminar
+                existingResume.IsActive = false;
+                context.Resumes.Update(existingResume);
+            }
+            else
+            {
+                context.Resumes.Remove(existingResume);
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Deletes a resume by resume Id (misma lógica que DeleteResumeByEmployeeId).
+        /// </summary>
+        public async Task DeleteResumeById(int id)
+        {
+            var existingResume = await context.Resumes
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (existingResume == null)
+                throw new KeyNotFoundException("Resume not found");
+
+            var hasApplications = await context.Applications
+                .AnyAsync(a => a.ResumeId == existingResume.Id);
+
+            if (hasApplications)
+            {
+                existingResume.IsActive = false;
+                context.Resumes.Update(existingResume);
+            }
+            else
+            {
+                context.Resumes.Remove(existingResume);
+            }
+
             await context.SaveChangesAsync();
         }
 

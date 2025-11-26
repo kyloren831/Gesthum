@@ -80,6 +80,7 @@ namespace GesthumServer.Services
             vacancy.Requirements = updatedVacant.Requirements;
             vacancy.Location = updatedVacant.Location;
             vacancy.CloseDate = updatedVacant.CloseDate;
+            vacancy.State = updatedVacant.State;
             ValidateVacancy(vacancy);
             await dbContext.SaveChangesAsync();
             return vacancy;

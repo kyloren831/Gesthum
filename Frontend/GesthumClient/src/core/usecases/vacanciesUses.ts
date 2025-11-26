@@ -13,3 +13,11 @@ export const createNewVacancy = async (vacancy: VacancyDto): Promise<Vacancy | u
     const repo = new VacanciesRepository();
     return await repo.createVacancy(vacancy);
 }
+export const updateVacancyDetails = async (id: number, vacancy: Vacancy): Promise<Vacancy | undefined> => {
+    const repo = new VacanciesRepository();
+    return await repo.updateVacancy(id, vacancy);
+}
+export const toggleVacancyState = async (id: number): Promise<void> => {
+    const repo = new VacanciesRepository();
+    return await repo.changeVacancyState(id);
+}

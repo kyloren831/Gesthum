@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { loginUser } from "../../core/usecases/auth/loginUser";
 import {logoutUser} from '../../core/usecases/auth/logoutUser';
@@ -12,7 +13,6 @@ export function useLogin(){
         try {
             setError(null);
             const userClaims: UserClaims | undefined  = await loginUser(email,password);
-            console.log(userClaims);
             if(userClaims != undefined){
                 return userClaims;
             }

@@ -3,5 +3,6 @@ export interface Employee{
     name:string;
     email:string;
     position:string;
-    department:string;
+    department: string;
+    photoUrl: string;
 }
