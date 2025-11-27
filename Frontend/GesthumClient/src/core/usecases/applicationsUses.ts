@@ -19,3 +19,9 @@ export const deleteApplication = async (applicationId: number): Promise<void> =>
     const repo = new ApplicationsRepository();
     return await repo.deleteApplication(applicationId);
 }
+
+// Nuevo usecase: obtener detalle completo de aplicación (JSON con resume y vacant)
+export const getApplicationById = async (applicationId: number): Promise<any | undefined> => {
+    const repo = new ApplicationsRepository();
+    return await repo.getApplicationDetails(applicationId);
+}

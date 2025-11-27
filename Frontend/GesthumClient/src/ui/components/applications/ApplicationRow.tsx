@@ -3,6 +3,7 @@ import type { Vacancy } from '../../../core/entities/Vacancy';
 import type { Application } from '../../../core/entities/Application';
 import styles from './ApplicationRow.module.css';
 import AdminStyles from '../../pages/admins/AdminDashboard.module.css';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   vacancy?: Vacancy;
@@ -15,6 +16,8 @@ type Props = {
 const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '');
 
 const ApplicationRow: React.FC<Props> = ({ vacancy, application, isAdmin, onWithdraw, onViewDetails }) => {
+  const navigate = useNavigate();
+
   const handleWithdrawClick = async () => {
     if (!application?.id) return;
     try {
@@ -22,6 +25,16 @@ const ApplicationRow: React.FC<Props> = ({ vacancy, application, isAdmin, onWith
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const handleViewDetails = async () => {
+    // Navegar a la nueva página de detalle de application
+    if (!application?.id) {
+      if (onViewDetails) onViewDetails(vacancy);
+      return;
+    }
+
+    navigate(`/applications/${application.id}`);
   };
 
   // Algunos DTOs pueden usar resumeId en vez de employeeId; intentar ambos
@@ -52,35 +65,27 @@ const ApplicationRow: React.FC<Props> = ({ vacancy, application, isAdmin, onWith
         </span>
       </td>
 
-      {!isAdmin && (
-        <td>
-          {application ? (
-            <div>
-              <div className={styles.appStatus}>{application.status}</div>
-              <div className={styles.appDate}>{formatDate(application.applicationDate)}</div>
-            </div>
-          ) : (
-            <div className={styles.muted}>—</div>
-          )}
-        </td>
-      )}
+      <td>
+        {application ? (
+          <div>
+            <div className={styles.appStatus}>{application.status}</div>
+            <div className={styles.appDate}>{formatDate(application.applicationDate)}</div>
+          </div>
+        ) : (
+          <div className={styles.muted}>—</div>
+        )}
+      </td>
 
       <td>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className={AdminStyles.secondaryButton} onClick={() => onViewDetails ? onViewDetails(vacancy) : console.log('Ver', vacancy?.id)}>
+          <button className={AdminStyles.secondaryButton} onClick={handleViewDetails}>
             Ver detalles
           </button>
 
-          {isAdmin ? (
-            <button className={AdminStyles.primaryButton} onClick={() => console.log('Editar vacante', vacancy?.id)}>
-              Editar
+          {!isAdmin && application?.id && (
+            <button className={styles.withdrawButton} onClick={handleWithdrawClick} aria-label="Retirar postulación">
+              Retirar
             </button>
-          ) : (
-            application?.id && (
-              <button className={styles.withdrawButton} onClick={handleWithdrawClick} aria-label="Retirar postulación">
-                Retirar
-              </button>
-            )
           )}
         </div>
       </td>

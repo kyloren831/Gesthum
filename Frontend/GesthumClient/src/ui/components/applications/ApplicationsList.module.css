@@ -24,7 +24,7 @@
 /* Tabla wrapper */
 .tableWrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: auto; /* mantenemos scroll horizontal como fallback */
   background: #fff;
   border-radius: 8px;
   padding: 12px;
@@ -36,7 +36,8 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  /* permitir que la tabla reduzca su tamaño en pantallas pequeñas */
+  min-width: auto;
   font-family: inherit;
 }
 
@@ -49,6 +50,37 @@
   font-size: 14px;
 }
 
+/* compactar en pantallas pequeñas */
+@media (max-width: 768px) {
+  .table thead { display: table-header-group; } /* mantener encabezado si cabe */
+  .table thead tr th {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  .table tbody tr {
+    /* permitir que las filas ocupen su contenido y no fuerzen scroll innecesario */
+  }
+  .table td {
+    padding: 10px 6px;
+    font-size: 13px;
+    white-space: normal;
+  }
+}
+
+/* En móviles muy pequeños reducir más */
+@media (max-width: 480px) {
+  .table thead { display: none; } /* ocultar encabezado para ahorrar espacio; filas deben leerse como bloque */
+  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table tr { margin-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.04); padding-bottom: 8px; }
+  .table td {
+    display: block;
+    padding: 8px 6px;
+    text-align: left;
+  }
+  /* opcional: si más adelante añades data-label en cada td, usar td::before para mostrar la etiqueta */
+}
+
+/* error / empty */
 .error {
   color: #b91c1c;
   padding: 12px 8px;

@@ -4,11 +4,13 @@
   border-bottom: 1px solid rgba(0,0,0,0.04);
   font-size: 14px;
   color: #0f172a;
+  white-space: normal; /* permitir wrapping */
 }
 
 .colTitle {
   max-width: 420px;
   padding-right: 12px;
+  word-break: break-word;
 }
 
 .title {
@@ -23,8 +25,10 @@
 }
 
 .colLocation {
-  width: 160px;
+  width: auto; /* no forzar ancho fijo */
+  max-width: 160px;
   color: #374151;
+  white-space: normal;
 }
 
 .badge {
@@ -59,7 +63,9 @@
 }
 
 .colActions {
-  width: 180px;
+  width: auto;
+  max-width: 180px;
+  text-align: right;
 }
 
 .withdrawButton {
@@ -69,4 +75,18 @@
   border-radius: 6px;
   cursor: pointer;
   color: #b91c1c;
+}
+
+/* responsive tweaks */
+@media (max-width: 768px) {
+  .row td { padding: 10px 6px; font-size: 13px; }
+  .colTitle { max-width: 100%; padding-right: 8px; }
+  .colLocation { max-width: 120px; }
+  .colActions { max-width: 140px; text-align: left; }
+  .withdrawButton { padding: 6px 8px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .row td { padding: 8px 6px; font-size: 13px; display: block; }
+  .colActions { text-align: left; margin-top: 8px; }
 }

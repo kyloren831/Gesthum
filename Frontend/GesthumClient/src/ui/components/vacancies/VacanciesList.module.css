@@ -56,7 +56,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    z-index: 210;
+    z-index: 40; /* reducido para no cubrir el submenú del header */
 
     /* NO definir background/border/box-shadow aquí */
 }
@@ -107,8 +107,8 @@
     /* Si el diseño no cabe, el botón se acerca más y se reduce; en pantallas muy pequeñas usar FAB inferior */
     .createButtonFixed {
         right: 12px;
-        top: auto !important;
-        bottom: calc(env(safe-area-inset-bottom, 20px) + 12px) !important;
+        top: auto;
+        bottom: calc(env(safe-area-inset-bottom, 20px) + 12px);
         padding: 7px 10px;
         width: 56px;
         height: 56px;
@@ -116,7 +116,7 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        z-index: 210 !important;
+        z-index: 40;
         /* NO definir background/box-shadow aquí */
     }
 
@@ -137,18 +137,18 @@
    No se aplican colores/gradientes aquí para que .primaryButton controle la apariencia. */
 @media (max-width: 768px) {
     .createButtonFixed {
-        position: fixed !important;
+        position: fixed;
         font-size: 0.85rem;
-        top: auto !important; /* aseguramos que no hay top aplicado */
-        bottom: calc(env(safe-area-inset-bottom, 20px) + 12px) !important; /* siempre abajo */
-        right: 16px !important;
+        top: auto; /* aseguramos que no hay top aplicado */
+        bottom: calc(env(safe-area-inset-bottom, 20px) + 12px); /* siempre abajo */
+        right: 16px;
         padding: 0;
         width: 56px; /* tamaño típico de FAB */
         height: 56px;
         border-radius: 999px; /* forma circular */
         justify-content: center;
         align-items: center;
-        z-index: 210 !important;
+        z-index: 40;
         /* NO definir background/box-shadow aquí */
     }
 
@@ -175,5 +175,6 @@
     .createButtonFixed {
         top: calc(var(--header-height, 70px) + 40px);
         right: 16px;
+        z-index: 40;
     }
 }

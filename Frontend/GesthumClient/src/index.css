@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+Ôªø@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700&display=swap');
 
 :root{
@@ -8,10 +8,16 @@
   --Dark-gray:#595959;
   --Light-gray:hwb(0 59% 41%);
   --container-max: 1140px;
-  --header-height: 70px; /* altura del header usada para posicionar botones fijos */
+  --header-height: 70px;
+
+  /* Breakpoints */
+  --bp-xs: 480px;
+  --bp-sm: 768px;
+  --bp-md: 1024px;
+  --bp-lg: 1280px;
 }
 
-/* Box sizing y tipografÌa base responsiva */
+/* Box sizing y tipografÔøΩa base responsiva */
 *,
 *::before,
 *::after {
@@ -21,7 +27,7 @@
 }
 
 html {
-  /* escala tipogr·fica fluida */
+  /* escala tipogr√°fica fluida */
   font-size: clamp(14px, 1.6vw, 16px);
 }
 
@@ -34,14 +40,7 @@ body {
   line-height: 1.4;
 }
 
-/* im·genes y svgs no se desbordan */
-img, svg, video {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* contenedores centrados util */
+/* utilidades responsive */
 .container {
   max-width: var(--container-max);
   margin-left: auto;
@@ -50,13 +49,50 @@ img, svg, video {
   padding-right: 16px;
 }
 
-/* enlaces accesibles */
-a {
-  color: inherit;
-  text-decoration: none;
+/* Flex helpers */
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.col {
+  flex: 1 1 0;
 }
 
-/* botones coherentes */
-button {
-  font: inherit;
+/* im√°genes y svgs no se desbordan */
+img, svg, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* small typography utility */
+.h6 {
+  font-size: 0.9rem;
+}
+
+/* table responsive helper: mantiene overflow-x pero permite reducci√≥n antes de scrollear */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ocultar elementos visuales en xs si es necesario */
+@media (max-width: 480px) {
+  .hide-xs { display: none !important; }
+  .p-xxs { padding: 6px !important; }
+}
+
+/* ejemplo: reducir paddings globales en pantallas peque√±as */
+@media (max-width: 768px) {
+  th, td { padding: 8px 6px; }
+}
+
+/* accesibilidad: texto escondido pero accesible */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
 }

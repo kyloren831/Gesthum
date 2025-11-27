@@ -96,3 +96,25 @@ export const deleteResume = async (resumeId: number): Promise<void> => {
     };
 };
 
+export const getResumeByApplicationId = async (applicationId: number): Promise<Resume | undefined> => {
+    if (!applicationId || applicationId <= 0) return undefined;
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Resumes/application/${applicationId}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    // si devuelve 404 -> no hay resume asociado
+    if (response.status === 404) {
+        console.info(`Resume not found for application ${applicationId} (404).`);
+        return undefined;
+    }
+
+    if (!response.ok) {
+        const backendMessage = await extractBackendMessage(response);
+        console.error('Get Resume by Application ID error response:', response.status, backendMessage);
+        throw new Error(backendMessage);
+    }
+
+    const data: Resume = await response.json();
+    return data;
+};

@@ -11,6 +11,8 @@ import UpdatePhotoModal from './ui/components/photoModal/UpdatePhotoModal'
 import ApplicationsPage from './ui/pages/applications/ApplicationsPage'
 import ResumesPage from './ui/pages/resumes/ResumesPage'
 import CreateResume from './ui/pages/resumes/CreateResume'
+import ApplicationDetailPage from './ui/pages/applications/ApplicationDetailPage'
+import EvaluationDetailPage from './ui/pages/evaluations/EvaluationDetailPage'
 
 function App() {
   return (
@@ -64,11 +66,31 @@ function App() {
             }
           />
 
+          {/* Nueva ruta: detalle de una aplicación (application) */}
+          <Route
+            path='/applications/:id'
+            element={
+              <PrivateRoute allowedRoles={['Admin','Employee']}>
+                <ApplicationDetailPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Rutas para evaluaciones */}
+          <Route
+            path='/evaluations/detail'
+            element={
+              <PrivateRoute allowedRoles={['Admin','Employee']}>
+                <EvaluationDetailPage />
+              </PrivateRoute>
+            }
+          />
+
           {/* Ruta para ver el CV (visible sólo para empleados) */}
           <Route
             path='/resumes'
             element={
-              <PrivateRoute allowedRoles={['Employee']}>
+                <PrivateRoute allowedRoles={['Admin', 'Employee']}>
                 <ResumesPage />
               </PrivateRoute>
             }

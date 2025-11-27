@@ -1,7 +1,23 @@
 export interface Application {
-    id: string;
+    id: number;
+    // Identificador del resume (backend usa ResumeId)
+    resumeId?: number;
+    // Alias/compatibilidad: algunos lugares usan vacancyId, el backend expone VacantId
     vacancyId: number;
-    employeeId: string;
+    vacantId?: number;
+    // Compatibilidad histórica (si existiera)
+    employeeId?: string;
+
+    // Fecha en ISO (serializada desde DateTime del backend)
     applicationDate: string;
-    status: 'Pending' | 'Passed' | 'Failed';
+
+    // Estado (permitimos string para ser flexible con posibles nuevos valores)
+    status: 'Pending' | 'Passed' | 'Failed' | string;
+
+    // Datos de la vacante incluidos en el DTO del backend
+    vacantTitle?: string;
+    vacantLocation?: string;
+    vacantPostedDate?: string;
+    vacantCloseDate?: string;
+    vacantState?: boolean;
 }

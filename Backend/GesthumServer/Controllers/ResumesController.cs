@@ -32,6 +32,16 @@ namespace GesthumServer.Controllers
            var resume = await resumesServices.GetResumeByEmployeeId(employeeId);
            return Ok(resume);
         }
+
+        // Nuevo: Get resume por application id
+        [HttpGet("by-application/{applicationId}")]
+        [Authorize]
+        public async Task<IActionResult> GetResumeByApplicationId(int applicationId)
+        {
+           var resume = await resumesServices.GetResumeByApplicationId(applicationId);
+           return Ok(resume);
+        }
+
         // Update resume by ID
         [HttpPut("{id}")]
         [Authorize]

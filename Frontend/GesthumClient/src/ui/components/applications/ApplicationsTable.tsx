@@ -33,7 +33,7 @@ const ApplicationsTable: React.FC<Props> = ({ applications, vacancies, isAdmin, 
             <th>Publicado</th>
             <th>Cierra</th>
             <th>Estado vacante</th>
-            {!isAdmin && <th>Solicitud</th>}
+            <th>Estado Solicitud</th>
             <th className={rowStyles.colActions}>Acciones</th>
           </tr>
         </thead>

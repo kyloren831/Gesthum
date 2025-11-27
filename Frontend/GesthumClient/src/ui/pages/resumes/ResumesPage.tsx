@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/header/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
 import LayoutStyles from '../../pages/admins/AdminDashboard.module.css';
@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useGetResume } from '../../hooks/resumes/useGetResume';
 import { useUserInfo } from '../../hooks/useUserInfo';
 import type { Employee } from '../../../core/entities/Employee';
+import type { Resume } from '../../../core/entities/Resume';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { useDeleteResume } from '../../hooks/resumes/useDeleteResume';
 
@@ -21,12 +22,17 @@ const generateInitialAvatar = (initial: string, size = 96) => {
 
 const ResumesPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { userClaims } = useAuth();
   const employeeId = userClaims && userClaims.role === 'Employee' ? Number.parseInt(userClaims.id) : undefined;
   const { resume, loading, error, fetchResume } = useGetResume(employeeId);
 
   const { employeeInfo } = useUserInfo();
   const [employee, setEmployee] = useState<Employee | undefined>(undefined);
+
+  // Si venimos desde ApplicationRow (admin) podemos recibir resume en location.state
+  const state = location.state as any;
+  const adminProvidedResume = state?.resumeForAdmin as Resume | undefined;
 
   // Delete hook
   const { loading: deleting, error: deleteError, fetchDeleteResume } = useDeleteResume();
@@ -47,11 +53,22 @@ const ResumesPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userClaims]);
 
+  // Si admin recibió resume por navigation state, evitar fetch por employeeId y mostrarlo
+  useEffect(() => {
+    if (userClaims?.role === 'Admin' && adminProvidedResume) {
+      // sí, mostramos el resume recibido; evitamos fetchResume por employeeId
+    } else if (employeeId) {
+      void fetchResume(employeeId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminProvidedResume, userClaims, employeeId]);
+
   const handleCreate = () => navigate('/resumes/create');
   const handleUpdate = () => {
-    if (!resume) return;
+    const r = adminProvidedResume ?? resume;
+    if (!r) return;
     // navegar a la misma ruta de creación pero con estado para edición
-    navigate('/resumes/create', { state: { mode: 'edit', resume } });
+    navigate('/resumes/create', { state: { mode: 'edit', resume: r } });
   };
 
   const openDeleteConfirm = () => {
@@ -65,10 +82,11 @@ const ResumesPage: React.FC = () => {
   };
 
   const handleConfirmDelete = async () => {
-    if (!resume) return;
+    const r = adminProvidedResume ?? resume;
+    if (!r) return;
     try {
       setOpError(null);
-      await fetchDeleteResume(resume.id);
+      await fetchDeleteResume(r.id);
       // refrescar el resume (podría quedar desactivado o eliminado)
       await fetchResume(employeeId);
       setShowDeleteConfirm(false);
@@ -79,6 +97,14 @@ const ResumesPage: React.FC = () => {
   };
 
   const isNotFoundError = !!error && error.includes('Get Resume by Employee ID failed');
+
+  const resumeToShow = adminProvidedResume ?? resume;
+
+  const handleCreateEvaluation = () => {
+    if (!resumeToShow) return;
+    // Ruta de ejemplo para crear evaluación, ajustar si existe otra ruta real
+    navigate('/evaluations/create', { state: { resumeId: resumeToShow.id } });
+  };
 
   return (
     <div className={LayoutStyles.body}>
@@ -92,7 +118,6 @@ const ResumesPage: React.FC = () => {
               <h2 className={Styles.pageTitle}>Mi CV</h2>
 
               <div className={Styles.actionsRow}>
-                {/* Mostrar crear/actualizar según el estado (se mantiene la UX previa) */}
                 <button
                   className={`${LayoutStyles.secondaryButton} ${Styles.actionBtn}`}
                   onClick={handleUpdate}
@@ -111,8 +136,7 @@ const ResumesPage: React.FC = () => {
                   Crear CV
                 </button>
 
-                {/* Botón para eliminar sólo si existe un resume */}
-                {resume && (
+                {resumeToShow && (
                   <button
                     className={`${LayoutStyles.secondaryButton} ${Styles.actionBtn}`}
                     onClick={openDeleteConfirm}
@@ -124,28 +148,81 @@ const ResumesPage: React.FC = () => {
                     Eliminar CV
                   </button>
                 )}
+
+                {/* Botón para crear evaluación visible sólo para Admin */}
+                {userClaims?.role === 'Admin' && resumeToShow && (
+                  <button
+                    className={`${LayoutStyles.primaryButton} ${Styles.actionBtn}`}
+                    onClick={handleCreateEvaluation}
+                    aria-label="Crear evaluación"
+                    style={{ marginLeft: 8 }}
+                  >
+                    Crear evaluación
+                  </button>
+                )}
               </div>
             </div>
 
-            {employee && (
-              <section className={Styles.card}>
-                <div className={Styles.profileHeader}>
-                  <img
-                    className={Styles.avatar}
-                    src={employee.photoUrl ?? generateInitialAvatar((employee.name ?? 'U').charAt(0), 96)}
-                    alt="Foto de perfil"
-                  />
-                  <div>
-                    <h2 className={Styles.name}>{employee.name}</h2>
-                    <p className={Styles.position}>{employee.position ?? ''}{employee.department ? `, ${employee.department}` : ''}</p>
+            {resumeToShow && (
+              <>
+                <section className={Styles.card}>
+                  <h2 className={Styles.cardTitle}>Resumen</h2>
+                  <div className={Styles.grid}>
+                    <div className={Styles.fieldFull}>
+                      <span className={Styles.label}>Perfil</span>
+                      <p className={Styles.value}>{resumeToShow.profileSummary}</p>
+                    </div>
+
+                    <div className={Styles.field}>
+                      <span className={Styles.label}>Formación Académica</span>
+                      <span className={Styles.value}>{resumeToShow.academicTraining}</span>
+                    </div>
+
+                    <div className={Styles.field}>
+                      <span className={Styles.label}>Habilidades</span>
+                      <span className={Styles.value}>{resumeToShow.skills}</span>
+                    </div>
+
+                    <div className={Styles.field}>
+                      <span className={Styles.label}>Idiomas</span>
+                      <span className={Styles.value}>{resumeToShow.languages}</span>
+                    </div>
+
+                    <div className={Styles.field}>
+                      <span className={Styles.label}>Creado</span>
+                      <span className={Styles.value}>{new Date(resumeToShow.creationDate).toLocaleString()}</span>
+                    </div>
                   </div>
-                </div>
-              </section>
+                </section>
+
+                <section className={Styles.card}>
+                  <h2 className={Styles.cardTitle}>Experiencia Laboral</h2>
+                  {resumeToShow.WorkExpList && resumeToShow.WorkExpList.length > 0 ? (
+                    <ul className={Styles.workList}>
+                      {resumeToShow.WorkExpList.map((w) => (
+                        <li key={w.id} className={Styles.workItem}>
+                          <div className={Styles.workHeader}>
+                            <strong>{w.position}</strong> — <span className={Styles.company}>{w.companyName}</span>
+                          </div>
+                          <div className={Styles.workMeta}>
+                            <span>{new Date(w.startDate).toLocaleDateString()}</span>
+                            {' — '}
+                            <span>{w.endDate ? new Date(w.endDate).toLocaleDateString() : 'Actual'}</span>
+                          </div>
+                          <p className={Styles.workDescription}>{w.description}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={Styles.message}>No hay experiencia laboral registrada.</p>
+                  )}
+                </section>
+              </>
             )}
 
             {loading && <div className={Styles.message}>Cargando CV...</div>}
 
-            {!loading && isNotFoundError && !resume && (
+            {!loading && isNotFoundError && !resumeToShow && (
               <div className={Styles.message}>
                 No se encontró ningún CV activo para este usuario.
                 <div style={{ marginTop: 12 }}>
@@ -165,7 +242,7 @@ const ResumesPage: React.FC = () => {
               <div className={Styles.error}>Error: {error}</div>
             )}
 
-            {!loading && !error && !resume && (
+            {!loading && !error && !resumeToShow && (
               <div className={Styles.message}>
                 No se encontró ningún CV activo para este usuario.
                 <div style={{ marginTop: 12 }}>
@@ -179,63 +256,6 @@ const ResumesPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-            )}
-
-            {resume && (
-              <>
-                <section className={Styles.card}>
-                  <h2 className={Styles.cardTitle}>Resumen</h2>
-                  <div className={Styles.grid}>
-                    <div className={Styles.fieldFull}>
-                      <span className={Styles.label}>Perfil</span>
-                      <p className={Styles.value}>{resume.profileSummary}</p>
-                    </div>
-
-                    <div className={Styles.field}>
-                      <span className={Styles.label}>Formación Académica</span>
-                      <span className={Styles.value}>{resume.academicTraining}</span>
-                    </div>
-
-                    <div className={Styles.field}>
-                      <span className={Styles.label}>Habilidades</span>
-                      <span className={Styles.value}>{resume.skills}</span>
-                    </div>
-
-                    <div className={Styles.field}>
-                      <span className={Styles.label}>Idiomas</span>
-                      <span className={Styles.value}>{resume.languages}</span>
-                    </div>
-
-                    <div className={Styles.field}>
-                      <span className={Styles.label}>Creado</span>
-                      <span className={Styles.value}>{new Date(resume.creationDate).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </section>
-
-                <section className={Styles.card}>
-                  <h2 className={Styles.cardTitle}>Experiencia Laboral</h2>
-                                  {resume.WorkExpList && resume.WorkExpList.length > 0 ? (
-                    <ul className={Styles.workList}>
-                                          {resume.WorkExpList.map((w) => (
-                        <li key={w.id} className={Styles.workItem}>
-                          <div className={Styles.workHeader}>
-                            <strong>{w.position}</strong> — <span className={Styles.company}>{w.companyName}</span>
-                          </div>
-                          <div className={Styles.workMeta}>
-                            <span>{new Date(w.startDate).toLocaleDateString()}</span>
-                            {' — '}
-                            <span>{w.endDate ? new Date(w.endDate).toLocaleDateString() : 'Actual'}</span>
-                          </div>
-                          <p className={Styles.workDescription}>{w.description}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className={Styles.message}>No hay experiencia laboral registrada.</p>
-                  )}
-                </section>
-              </>
             )}
 
             {/* Modal de confirmación eliminación */}

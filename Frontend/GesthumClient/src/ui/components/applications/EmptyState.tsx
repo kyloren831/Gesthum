@@ -1,4 +1,4 @@
-import React from 'react';
+ï»¿import React from 'react';
 import styles from './ApplicationsList.module.css';
 
 const EmptyState: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => (
@@ -6,12 +6,12 @@ const EmptyState: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => (
     {isAdmin ? (
       <>
         <h3>No hay vacantes Que revisar.</h3>
-        <p style={{ color: '#6b7280' }}>Crea vacantes desde el panel de administración.</p>
+        <p style={{ color: '#6b7280' }}>Crea vacantes desde el panel de administraciÃ³n.</p>
       </>
     ) : (
       <>
         <h3>No hay postulaciones.</h3>
-        <p style={{ color: '#6b7280' }}>Aún no te has postulado a ninguna vacante.</p>
+        <p style={{ color: '#6b7280' }}>AÃºn no te has postulado a ninguna vacante.</p>
       </>
     )}
   </div>

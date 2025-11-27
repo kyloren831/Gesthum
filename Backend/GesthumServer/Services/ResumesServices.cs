@@ -11,6 +11,7 @@ namespace GesthumServer.Services
         Task DeleteResumeById(int id);
         Task<Resume> GetResumeByEmployeeId(int id);
         Task<Resume> UpdateResume(int id, PostResume updatedResume);
+        Task<Resume> GetResumeByApplicationId(int applicationId);
     }
 
     public class ResumesServices : IResumesServices
@@ -73,6 +74,22 @@ namespace GesthumServer.Services
                 throw new KeyNotFoundException("Resume activo no encontrado para este empleado");
 
             return resume;
+        }
+
+        /// <summary>
+        /// Nuevo: obtiene el resume asociado a una application (por application id).
+        /// </summary>
+        public async Task<Resume> GetResumeByApplicationId(int applicationId)
+        {
+            var application = await context.Applications
+                .Include(a => a.Resume)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id == applicationId);
+
+            if (application == null || application.Resume == null)
+                throw new KeyNotFoundException("Resume no encontrado para la application especificada");
+
+            return application.Resume;
         }
 
         /// <summary>

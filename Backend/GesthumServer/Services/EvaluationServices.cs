@@ -9,6 +9,8 @@ namespace GesthumServer.Services
 {
     public interface IEvaluationServices
     {
+        Task<Evaluation> GetEvaluationById(int id);
+        Task<Evaluation> GetEvaluationByApplicationId(int applicationId);
         Task<Evaluation> CreateEvaluationForApplicationAsync(int applicationId, string model = "gemini-2.0-flash", CancellationToken cancellationToken = default);
     }
 
@@ -30,6 +32,70 @@ namespace GesthumServer.Services
             {
                 logger.LogWarning("GeminiApiKey no está configurada en appsettings.json. Las llamadas a la API de Gemini fallarán.");
             }
+        }
+
+        public async Task<Evaluation> GetEvaluationById(int id)
+        {
+            var evaluation = await dbContext.Set<Evaluation>()
+                .Include(e => e.Application)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (evaluation == null)
+                throw new KeyNotFoundException("Evaluation not found");
+
+            // Romper referencias que puedan producir ciclos al serializar
+            if (evaluation.Application != null)
+            {
+                if (evaluation.Application.Resume != null)
+                {
+                    evaluation.Application.Resume.Employee = null;
+
+                    if (evaluation.Application.Resume.WorkExperience != null)
+                    {
+                        foreach (var we in evaluation.Application.Resume.WorkExperience)
+                        {
+                            we.Resume = null;
+                        }
+                    }
+                }
+            }
+
+            return evaluation;
+        }
+
+        public async Task<Evaluation> GetEvaluationByApplicationId(int applicationId)
+        {
+            var evaluation = await dbContext.Set<Evaluation>()
+                .Include(e => e.Application)
+                    .ThenInclude(a => a.Resume)
+                        .ThenInclude(r => r.WorkExperience)
+                .Include(e => e.Application)
+                    .ThenInclude(a => a.Vacant)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.ApplicationId == applicationId);
+
+            if (evaluation == null)
+                throw new KeyNotFoundException("Evaluation not found for the specified application");
+
+            // Romper referencias que puedan producir ciclos al serializar
+            if (evaluation.Application != null)
+            {
+                if (evaluation.Application.Resume != null)
+                {
+                    evaluation.Application.Resume.Employee = null;
+
+                    if (evaluation.Application.Resume.WorkExperience != null)
+                    {
+                        foreach (var we in evaluation.Application.Resume.WorkExperience)
+                        {
+                            we.Resume = null;
+                        }
+                    }
+                }
+            }
+
+            return evaluation;
         }
 
         /// <summary>
@@ -54,6 +120,14 @@ namespace GesthumServer.Services
 
             if (application.Vacant == null)
                 throw new InvalidOperationException($"Application {applicationId} has no vacancy attached.");
+
+            // Nuevo: impedir creación si ya existe una evaluación para esta aplicación
+            var existingEvaluation = await dbContext.Set<Evaluation>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.ApplicationId == applicationId, cancellationToken);
+
+            if (existingEvaluation != null)
+                throw new InvalidOperationException($"An evaluation already exists for application {applicationId}.");
 
             // Construir prompt indicando explícitamente salida JSON
             var prompt = BuildEvaluationPrompt(application.Vacant, application.Resume);

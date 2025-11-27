@@ -24,7 +24,7 @@ const Form = () => {
       const user = await login(email,password);
       if(user){
         setLoading(false);
-        return user.role == 'Admin'? navegate('/adminDash') : navegate ('/emplDash')
+          return user.role == 'Admin' ? navegate('/adminDash') : navegate('/vacantes')
       }
     } catch (error) {
       console.log(error);

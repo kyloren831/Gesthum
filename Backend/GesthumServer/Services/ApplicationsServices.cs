@@ -6,6 +6,7 @@ namespace GesthumServer.Services
 {
     public interface IApplicationsServices
     {
+        Task<Application> GetApplicationById(int applicationId);
         Task<GetApplicationDTO> CreateApplication(PostApplicationDTO postApplicationDTO);
         Task DeleteApplication(int applicationId);
         Task<List<GetApplicationDTO>> GetAllApplications();
@@ -23,6 +24,38 @@ namespace GesthumServer.Services
         {
             this.context = context;
             this.resumesServices = resumesServices;
+        }
+
+        public async Task<Application> GetApplicationById(int applicationId)
+        {
+            // Traer Application junto con Resume (y sus WorkExperience) y Vacant en modo AsNoTracking
+            var application = await context.Applications
+                .AsNoTracking()
+                .Include(a => a.Resume)
+                    .ThenInclude(r => r.WorkExperience)
+                .Include(a => a.Vacant)
+                .FirstOrDefaultAsync(x => x.Id == applicationId);
+
+            if (application == null)
+            {
+                throw new KeyNotFoundException("Application not found");
+            }
+
+            // Romper referencias que puedan producir ciclos al serializar (por ejemplo Resume -> Employee o WorkExperience -> Resume)
+            if (application.Resume != null)
+            {
+                application.Resume.Employee = null;
+
+                if (application.Resume.WorkExperience != null)
+                {
+                    foreach (var we in application.Resume.WorkExperience)
+                    {
+                        we.Resume = null;
+                    }
+                }
+            }
+
+            return application;
         }
 
         public async Task<GetApplicationDTO> CreateApplication(PostApplicationDTO postApplicationDTO)
@@ -60,6 +93,7 @@ namespace GesthumServer.Services
             };
         }
 
+       
         public async Task<List<GetApplicationDTO>> GetApplicationsByVacantId(int vacantId)
         {
             var applications = await context.Applications
