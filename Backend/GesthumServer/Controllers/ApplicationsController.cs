@@ -2,7 +2,6 @@
 using GesthumServer.Services;
 using GesthumServer.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GesthumServer.Controllers
